@@ -1,0 +1,8 @@
+.idea/
+.pytest_cache/
+__pycache__/
+.mypy_cache/
+venv/
+data/
+pipreqs_ignored/
+lightning_logs/

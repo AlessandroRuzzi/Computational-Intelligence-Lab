@@ -107,6 +107,4 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate", default=0.0001, type=float)
     parser.add_argument("--batch_size", default=32, type=int)
     args = parser.parse_args()
-    print(type(args))
-
     main(args)

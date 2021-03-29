@@ -6,3 +6,6 @@ venv/
 data/
 pipreqs_ignored/
 lightning_logs/
+comet_logs/
+MNIST
+.vscode/

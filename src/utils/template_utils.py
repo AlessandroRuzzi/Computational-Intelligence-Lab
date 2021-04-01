@@ -5,8 +5,10 @@
 
 import logging
 import warnings
-from typing import List, Sequence
+from typing import Any, List, Sequence
 
+import matplotlib.pyplot as plt
+import numpy as np
 import pytorch_lightning as pl
 from omegaconf import DictConfig, OmegaConf
 from rich import print
@@ -164,3 +166,23 @@ def log_hyperparameters(
     # disable logging any more hyperparameters for all loggers
     # (this is just a trick to prevent trainer from logging hparams of model, since we already did that above)
     trainer.logger.log_hyperparams = empty
+
+
+def imshow(
+    image: Any,
+    normalize: bool = False,
+) -> None:
+    """Imshow for Tensor."""
+    fig, ax = plt.subplots()
+    image = image.numpy().transpose((1, 2, 0))
+
+    if normalize:
+        mean = np.array([0.485, 0.456, 0.406])
+        std = np.array([0.229, 0.224, 0.225])
+        image = std * image + mean
+        image = np.clip(image, 0, 1)
+
+    ax.imshow(image, cmap="gray")
+    ax.set_xticklabels(list(""))
+    ax.set_yticklabels(list(""))
+    plt.show()

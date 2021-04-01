@@ -6,5 +6,7 @@ venv/
 .pytest_cache/
 .mypy_cache/
 pipreqs_ignored/
-data/
-logs/
+data/*
+!data/.gitkeep
+logs/*
+!logs/.gitkeep

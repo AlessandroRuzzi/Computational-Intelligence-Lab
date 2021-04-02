@@ -3,7 +3,6 @@ import re
 import zipfile
 from typing import Any, Callable, List, Optional, Tuple
 
-import dotenv
 import torch
 from PIL import Image
 
@@ -163,13 +162,3 @@ class RoadSegmentationDataset(torch.utils.data.Dataset):
 
     def _img_number_from_name(self, name: str) -> int:
         return int(re.compile(r"\d+").findall(name)[0])
-
-
-def main() -> None:
-    dotenv.load_dotenv(override=True)
-    dataset = RoadSegmentationDataset("data/", train=True, download=True)
-    print(dataset.__getitem__(40))
-
-
-if __name__ == "__main__":
-    main()

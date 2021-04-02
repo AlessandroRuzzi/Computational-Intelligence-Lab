@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, List
 
 import torchvision.transforms.functional as F
 from torchvision.transforms import transforms
@@ -11,11 +11,11 @@ class RandomAffine:
 
     def __init__(
         self,
-        img_size: list = None,
-        degrees: list = None,
-        translate: list = None,
-        scale_ranges: list = None,
-        shears: list = None,
+        img_size: List[int] = None,
+        degrees: List[float] = None,
+        translate: List[float] = None,
+        scale_ranges: List[float] = None,
+        shears: List[float] = None,
     ) -> None:
         if img_size is None:
             img_size = [400, 400]

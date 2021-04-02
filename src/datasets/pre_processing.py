@@ -3,7 +3,9 @@ from torchvision import transforms
 from torchvision.datasets.vision import StandardTransform
 
 from src.datasets.road_segmentation_dataset import RoadSegmentationDataset
+from src.datasets.transforms.random_affine import RandomAffine
 from src.datasets.transforms.random_crop import RandomCrop
+from src.datasets.transforms.random_flip import RandomFlip
 from src.utils.template_utils import imshow
 
 
@@ -30,9 +32,12 @@ class PreProcessor:
         imshow(image)
         imshow(mask)
 
-        cropper = RandomCrop(output_size=(200, 200))
-        # flip = RandomFlip(1)
-        images = cropper(image, mask)
+        # flake8: noqa
+        cropper = RandomCrop()
+        # flake8: noqa
+        flip = RandomFlip()
+        affine = RandomAffine(degrees=[30, 30])
+        images = affine(image, mask)
         for image in images:
             imshow(image)
 

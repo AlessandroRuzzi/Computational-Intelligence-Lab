@@ -3,6 +3,7 @@ from torchvision import transforms
 from torchvision.datasets.vision import StandardTransform
 
 from src.datasets.road_segmentation_dataset import RoadSegmentationDataset
+from src.datasets.transforms.random_crop import RandomCrop
 from src.utils.template_utils import imshow
 
 
@@ -14,16 +15,11 @@ class PreProcessor:
     def pre_process_erasing(self) -> None:
         transform_image = torchvision.transforms.Compose(
             [
-                transforms.Resize(255),
                 transforms.ToTensor(),
-                transforms.RandomErasing()
-                # transforms.Normalize((0.1307,), (0.3081,))
             ]
         )
 
-        transform_mask = transforms.Compose(
-            [transforms.Resize(255), transforms.ToTensor()]
-        )
+        transform_mask = transforms.Compose([transforms.ToTensor()])
 
         standard_tranform = StandardTransform(transform_image, transform_mask)
         dataset = RoadSegmentationDataset(
@@ -34,9 +30,13 @@ class PreProcessor:
         imshow(image)
         imshow(mask)
 
-        print(image.size(), mask.size(), image.dtype, mask.dtype)
+        cropper = RandomCrop(output_size=(200, 200))
+        # flip = RandomFlip(1)
+        images = cropper(image, mask)
+        for image in images:
+            imshow(image)
 
-        # torchvision.transforms.ToPILImage()(image).save("test.png")
+        print(image.size(), mask.size(), image.dtype, mask.dtype)
 
 
 def main() -> None:

@@ -1,5 +1,7 @@
 from typing import Any
 
+import torchvision.transforms.functional as F
+
 
 class RandomFlip:
     """
@@ -10,5 +12,9 @@ class RandomFlip:
         pass
 
     def __call__(self, *inputs: Any) -> Any:
-        # TODO
-        pass
+        processed_images = []
+
+        for index, _input in enumerate(inputs):
+            processed_images.append(F.hflip(_input))
+
+        return processed_images

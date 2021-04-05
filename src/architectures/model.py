@@ -54,7 +54,7 @@ class UNET(nn.Module):
 
         for down in self.downs:
             x = down(x)
-            skip.skip_connections.append(x)
+            skip_connections.append(x)
             x = self.pool(x)
 
         x = self.bottleneck(x)

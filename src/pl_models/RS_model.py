@@ -6,7 +6,7 @@ from hydra.utils import instantiate
 from pytorch_lightning.metrics.classification import Accuracy
 from torch.optim import Optimizer
 
-from src.architectures.simple_net import UNET
+from src.architectures.model import UNET
 
 class RS_model(pl.LightningModule):
     def __init__(

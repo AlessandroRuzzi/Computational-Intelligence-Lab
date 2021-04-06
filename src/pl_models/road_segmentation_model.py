@@ -21,7 +21,7 @@ class RoadSegmentationModel(pl.LightningModule):
         self.model = UNET(
             in_channels=self.hparams.in_channels, out_channels=self.hparams.out_channels
         )
-        self.loss = torch.nn.CrossEntropyLoss()
+        self.loss = torch.nn.BCEWithLogitsLoss()
 
         self.train_accuracy = Accuracy()
         self.val_accuracy = Accuracy()
@@ -40,27 +40,27 @@ class RoadSegmentationModel(pl.LightningModule):
         self, batch: List[torch.Tensor], batch_idx: int
     ) -> Dict[str, torch.Tensor]:
         loss, preds, targets = self.step(batch)
-        acc = self.train_accuracy(preds, targets)
+        # acc = self.train_accuracy(preds, targets)
         self.log("train/loss", loss, on_step=False, on_epoch=True, prog_bar=False)
-        self.log("train/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
+        # self.log("train/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
         return {"loss": loss, "preds": preds, "targets": targets}
 
     def validation_step(
         self, batch: List[torch.Tensor], batch_id: int
     ) -> Dict[str, torch.Tensor]:
         loss, preds, targets = self.step(batch)
-        acc = self.val_accuracy(preds, targets)
+        # acc = self.val_accuracy(preds, targets)
         self.log("val/loss", loss, on_step=False, on_epoch=True, prog_bar=False)
-        self.log("val/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
+        # self.log("val/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
         return {"loss": loss, "preds": preds, "targets": targets}
 
     def test_step(
         self, batch: List[torch.Tensor], batch_id: int
     ) -> Dict[str, torch.Tensor]:
         loss, preds, targets = self.step(batch)
-        acc = self.test_accuracy(preds, targets)
+        # acc = self.test_accuracy(preds, targets)
         self.log("test/loss", loss, on_step=False, on_epoch=True)
-        self.log("test/acc", acc, on_step=False, on_epoch=True)
+        # self.log("test/acc", acc, on_step=False, on_epoch=True)
         return {"loss": loss}
 
     def configure_optimizers(

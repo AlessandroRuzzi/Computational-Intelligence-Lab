@@ -28,7 +28,8 @@ class RandomAffine:
         self.shears = shears
 
     def __call__(self, *inputs: Any) -> Any:
-        processed_images = []
+        outputs = list(inputs)
+
         i, j, w, h, = transforms.RandomAffine.get_params(
             self.degrees,
             translate=None,
@@ -38,6 +39,6 @@ class RandomAffine:
         )
 
         for index, _input in enumerate(inputs):
-            processed_images.append(F.affine(_input, i, list(j), w, list(h)))
+            outputs[index] = F.affine(_input, i, list(j), w, list(h))
 
-        return processed_images
+        return outputs

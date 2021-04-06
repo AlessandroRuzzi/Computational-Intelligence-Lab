@@ -1,0 +1,13 @@
+_target_: src.pl_datamodules.road_segmentation_datamodule.RoadSegmentationDataModule
+data_dir: ${data_dir}  # data_dir is specified in config.yaml
+batch_size: 64
+train_val_split: [80, 20]
+num_workers: 0
+pin_memory: False
+
+defaults:
+  - transforms: composition_example.yaml
+
+
+
+

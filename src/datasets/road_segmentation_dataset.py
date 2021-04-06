@@ -151,6 +151,7 @@ class RoadSegmentationDataset(torch.utils.data.Dataset):
         return len(self.images)
 
     def _check_exists(self) -> bool:
+        print(self.folder_train)
         if self.train:
             return os.path.exists(self.folder_train)
         else:

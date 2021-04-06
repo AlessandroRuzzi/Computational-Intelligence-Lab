@@ -1,7 +1,7 @@
 defaults:
   - trainer: default_trainer.yaml
-  - model: mnist_model.yaml 
-  - datamodule: mnist_datamodule.yaml 
+  - model: road_segmentation_model.yaml 
+  - datamodule: road_segmentation_datamodule.yaml 
   - optimizer: adam.yaml 
   - callbacks: default_callbacks.yaml
   - logger: comet.yaml 

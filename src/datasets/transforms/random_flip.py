@@ -13,12 +13,13 @@ class RandomFlip:
         self.p = p
 
     def __call__(self, *inputs: Any) -> Any:
-        processed_images = []
+        outputs = list(inputs)
+
         if torch.rand(1) > self.p:
             for index, _input in enumerate(inputs):
-                processed_images.append(F.hflip(_input))
+                outputs[index] = F.hflip(_input)
         else:
             for index, _input in enumerate(inputs):
-                processed_images.append(F.vflip(_input))
+                outputs[index] = F.vflip(_input)
 
-        return processed_images
+        return outputs

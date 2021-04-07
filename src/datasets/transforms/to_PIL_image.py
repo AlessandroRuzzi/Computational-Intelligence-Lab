@@ -3,13 +3,13 @@ from typing import Any
 from torchvision import transforms
 
 
-class ToTensor:
+class ToPILImage:
     """
     Converts all inputs to tensors.
     """
 
     def __init__(self) -> None:
-        self.transform = transforms.ToTensor()
+        self.transform = transforms.ToPILImage()
 
     def __call__(self, *inputs: Any) -> Any:
         outputs = list(inputs)

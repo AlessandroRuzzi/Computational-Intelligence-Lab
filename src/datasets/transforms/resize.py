@@ -3,13 +3,13 @@ from typing import Any
 from torchvision import transforms
 
 
-class ToTensor:
+class Resize:
     """
     Converts all inputs to tensors.
     """
 
-    def __init__(self) -> None:
-        self.transform = transforms.ToTensor()
+    def __init__(self, size: Any) -> None:
+        self.transform = transforms.Resize(size)
 
     def __call__(self, *inputs: Any) -> Any:
         outputs = list(inputs)

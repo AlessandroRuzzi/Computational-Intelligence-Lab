@@ -1,25 +1,35 @@
 _target_: src.datasets.transforms.compose.Compose 
-transforms: 
-  - _target_: src.datasets.transforms.to_tensor.ToTensor
+transforms:  
   - _target_: src.datasets.transforms.random_choice_compose.RandomChoiceCompose # Picks one of the following transforms at random 
     transforms: 
-      - _target_: src.datasets.transforms.random_flip.RandomFlip
-      #- _target_: src.datasets.transforms.random_affine.RandomAffine
-      #  degrees: [30, 30]         
-      #- _target_: src.datasets.transforms.random_crop.RandomCrop # This must be fixed to return always images of size 1x400x400
+      - _target_: src.datasets.transforms.random_flip.RandomFlip # Randomly flips the image in one direction 
+
+      - _target_: src.datasets.transforms.random_affine.RandomAffine # Randomly applies an affine transformation to the image 
+        degrees: [30, 30]  
+
+      - _target_: src.datasets.transforms.compose.Compose  # Randomly crops part of the image and resizes it to original size
+        transforms:
+          - _target_: src.datasets.transforms.random_crop.RandomCrop 
+          - _target_: src.datasets.transforms.resize.Resize
+            size: [400, 400] 
+
       - _target_: src.datasets.transforms.distinct.Distinct # Applies only a grayscale transform on the first image
         transforms: 
-          - _target_: torchvision.transforms.Compose
-            transforms: 
-            - _target_: torchvision.transforms.ToPILImage
-            - _target_: torchvision.transforms.Grayscale
-              num_output_channels: 3 
-            - _target_: torchvision.transforms.ToTensor
+          - _target_: torchvision.transforms.Grayscale
+            num_output_channels: 3 
+
       - _target_: src.datasets.transforms.distinct.Distinct # Applies only an erasing transform on the first image 
         transforms:
-          - _target_: torchvision.transforms.RandomErasing 
-            p: 1.0 
-      - _target_: src.datasets.transforms.identity.Identity # Do nothing, i.e. keep the original image 
+          - _target_: torchvision.transforms.Compose 
+            transforms:
+              - _target_: torchvision.transforms.ToTensor 
+              - _target_: torchvision.transforms.RandomErasing 
+                p: 1.0 
+              - _target_: torchvision.transforms.ToPILImage 
+
+      - _target_: src.datasets.transforms.identity.Identity # Do nothing, i.e. keep the original image
+
+  - _target_: src.datasets.transforms.to_tensor.ToTensor 
 
         
         

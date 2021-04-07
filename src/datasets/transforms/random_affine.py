@@ -1,5 +1,6 @@
 from typing import Any, List
 
+import torchvision
 import torchvision.transforms.functional as F
 from torchvision.transforms import transforms
 
@@ -39,6 +40,7 @@ class RandomAffine:
         )
 
         for index, _input in enumerate(outputs):
-            outputs[index] = F.affine(_input, i, list(j), w, list(h))
+            _input = torchvision.transforms.ToPILImage(_input)
+            outputs[index] = F.affine(_input, i, j, w, h)
 
         return outputs

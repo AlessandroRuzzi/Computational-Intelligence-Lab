@@ -69,7 +69,10 @@ class RoadSegmentationDataset(torch.utils.data.Dataset):
 
         api.authenticate()
 
-        print(f"Downloading competition dataset <{self.kaggle_competition}>.")
+        image_set = "Train" if self.train else "Test"
+        print(
+            f"Downloading kaggle dataset <competition={self.kaggle_competition}, set={image_set}>."
+        )
         api.competition_download_files(self.kaggle_competition, path=self.folder_raw)
 
         self.unzip()
@@ -79,6 +82,7 @@ class RoadSegmentationDataset(torch.utils.data.Dataset):
         source_zip = os.path.join(self.folder_raw, self.kaggle_competition) + ".zip"
         zipdata = zipfile.ZipFile(source_zip)
         # Extract either train or test images and rename them.
+        test_index = 0
         for zipinfo in zipdata.infolist():
             img_name = zipinfo.filename
             if self.train:
@@ -88,19 +92,21 @@ class RoadSegmentationDataset(torch.utils.data.Dataset):
                     )
                     zipdata.extract(zipinfo, self.folder_train)
                     self.images.append(zipinfo.filename)
+
                 if img_name.startswith(self.kaggle_folder_train_masks):
                     zipinfo.filename = (
                         f"{self._img_number_from_name(img_name)-1:03d}_mask.png"
                     )
                     zipdata.extract(zipinfo, self.folder_train)
                     self.masks.append(zipinfo.filename)
+
             else:
                 if img_name.startswith(self.kaggle_folder_test_images):
-                    zipinfo.filename = (
-                        f"{self._img_number_from_name(img_name)-1:03d}_image.png"
-                    )
+                    # For some reason the first image has number 7...
+                    zipinfo.filename = f"{test_index:03d}_image.png"
                     zipdata.extract(zipinfo, self.folder_test)
                     self.images.append(zipinfo.filename)
+                    test_index += 1
 
     def process(self) -> None:
 
@@ -125,8 +131,8 @@ class RoadSegmentationDataset(torch.utils.data.Dataset):
         else:
             folder_test_files = [
                 f
-                for f in os.listdir(self.folder_train)
-                if os.path.isfile(os.path.join(self.folder_train, f))
+                for f in os.listdir(self.folder_test)
+                if os.path.isfile(os.path.join(self.folder_test, f))
             ]
             images = [
                 os.path.join(self.folder_test, f)
@@ -139,13 +145,22 @@ class RoadSegmentationDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index: int) -> Tuple[Any, Any]:
 
-        image = Image.open(self.images[index]).convert("RGB")
-        mask = Image.open(self.masks[index])
+        if self.train:
+            image = Image.open(self.images[index]).convert("RGB")
+            mask = Image.open(self.masks[index])
 
-        if self.transforms is not None:
-            image, mask = self.transforms(image, mask)
+            if self.transforms is not None:
+                image, mask = self.transforms(image, mask)
 
-        return image, mask
+            return image, mask
+
+        else:
+            image = Image.open(self.images[index]).convert("RGB")
+
+            if self.transforms is not None:
+                return self.transforms(image)
+
+            return image
 
     def __len__(self) -> int:
         return len(self.images)

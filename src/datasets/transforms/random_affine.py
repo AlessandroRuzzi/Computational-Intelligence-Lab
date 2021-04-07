@@ -38,7 +38,7 @@ class RandomAffine:
             img_size=self.img_size,
         )
 
-        for index, _input in enumerate(inputs):
+        for index, _input in enumerate(outputs):
             outputs[index] = F.affine(_input, i, list(j), w, list(h))
 
         return outputs

@@ -1,6 +1,7 @@
 from typing import Any, Callable
 
 import pytorch_lightning as pl
+import torchvision
 from torch.utils.data import DataLoader, random_split
 
 from src.datasets.road_segmentation_dataset import RoadSegmentationDataset
@@ -28,7 +29,12 @@ class RoadSegmentationDataModule(pl.LightningDataModule):
         self.pin_memory = pin_memory
 
         self.transforms_train = transforms
-        self.transforms_test = ToTensor()
+        self.transforms_test = torchvision.transforms.Compose(
+            [
+                torchvision.transforms.ToTensor(),
+                torchvision.transforms.Resize((400, 400)),
+            ]
+        )
 
         self.dims = (3, 400, 400)
 

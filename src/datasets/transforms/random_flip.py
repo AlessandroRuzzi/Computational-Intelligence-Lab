@@ -16,10 +16,10 @@ class RandomFlip:
         outputs = list(inputs)
 
         if torch.rand(1) > self.p:
-            for index, _input in enumerate(inputs):
+            for index, _input in enumerate(outputs):
                 outputs[index] = F.hflip(_input)
         else:
-            for index, _input in enumerate(inputs):
+            for index, _input in enumerate(outputs):
                 outputs[index] = F.vflip(_input)
 
         return outputs

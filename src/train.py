@@ -63,8 +63,10 @@ def train(config: DictConfig) -> None:
     trainer.fit(model=model, datamodule=datamodule)
 
     # Evaluate model on test set
-    if not config.trainer.get("fast_dev_run"):
-        log.info("Starting test set evaluation.")
+    log.info("Starting test set evaluation.")
+    if config.trainer.get("fast_dev_run"):
+        trainer.test(ckpt_path=None)
+    else:
         trainer.test()
 
     # Print path to best checkpoint

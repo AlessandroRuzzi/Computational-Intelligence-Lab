@@ -16,7 +16,7 @@ class ToTensor:
 
         transform_to_tensor = transforms.ToTensor()
 
-        for index, _input in enumerate(inputs):
+        for index, _input in enumerate(outputs):
             outputs[index] = transform_to_tensor(_input)
 
         return outputs

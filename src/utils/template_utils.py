@@ -49,8 +49,8 @@ def extras(config: DictConfig) -> None:
         # Debuggers don't like GPUs or multiprocessing
         if config.trainer.get("gpus"):
             config.trainer.gpus = 0
-        if config.datamodule.get("num_workers"):
-            config.datamodule.num_workers = 0
+        # if config.datamodule.get("num_workers"):
+        #    config.datamodule.num_workers = 0
 
     # force multi-gpu friendly configuration if <config.trainer.accelerator=ddp>
     if config.trainer.get("accelerator") in ["ddp", "ddp_spawn", "dp", "ddp2"]:

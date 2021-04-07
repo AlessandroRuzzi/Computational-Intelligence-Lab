@@ -13,7 +13,7 @@ work_dir: ${hydra:runtime.cwd}
 data_dir: ${work_dir}/data 
 debug: False # This uses pytorch-lighning fast_dev_run
 print_config: True # Pretty prints configs at the start of run 
-disable_warnings: True 
+disable_warnings: False 
 
 hydra:
   # Output paths for hydra logs

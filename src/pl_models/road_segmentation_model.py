@@ -6,7 +6,7 @@ from hydra.utils import instantiate
 from pytorch_lightning.metrics.classification import Accuracy
 from torch.optim import Optimizer
 
-# from src.architectures.unet import UNET
+from src.architectures.unet import UNET
 
 
 class RoadSegmentationModel(pl.LightningModule):
@@ -16,14 +16,8 @@ class RoadSegmentationModel(pl.LightningModule):
         super().__init__()
         self.save_hyperparameters()
 
-        # self.model = UNET(in_channels=self.hparams.in_channels, out_channels=self.hparams.out_channels)
-
-        self.model = torch.nn.Sequential(
-            torch.nn.Conv2d(in_channels, out_channels, 3, 1, 1, bias=False),
-            torch.nn.BatchNorm2d(out_channels),
-            torch.nn.ReLU(inplace=True),
-            torch.nn.Conv2d(out_channels, out_channels, 3, 1, 1, bias=False),
-            torch.nn.BatchNorm2d(out_channels),
+        self.model = UNET(
+            in_channels=self.hparams.in_channels, out_channels=self.hparams.out_channels
         )
 
         self.loss = torch.nn.BCEWithLogitsLoss()

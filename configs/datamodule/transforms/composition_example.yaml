@@ -29,7 +29,7 @@ transforms:
 
       - _target_: src.datasets.transforms.identity.Identity # Do nothing, i.e. keep the original image
 
-  - _target_: src.datasets.transforms.to_tensor.ToTensor 
+  - _target_: src.datasets.transforms.to_tensor.ToTensor # At the end convert everything to tensor, TODO: normalize?
 
         
         

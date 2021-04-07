@@ -31,8 +31,8 @@ class RoadSegmentationDataModule(pl.LightningDataModule):
         self.transforms_train = transforms
         self.transforms_test = torchvision.transforms.Compose(
             [
-                torchvision.transforms.ToTensor(),
                 torchvision.transforms.Resize((400, 400)),
+                torchvision.transforms.ToTensor(),
             ]
         )
 

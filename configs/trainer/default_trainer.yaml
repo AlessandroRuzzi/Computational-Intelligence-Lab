@@ -6,9 +6,9 @@ gpus: 0
 # Logs memory of GPUs, default `None` 
 log_gpu_memory: all 
 # Precision used for tensors, default `32`
-precision: 16 
+precision: 32
 # `ddp` GPUs train individually and sync gradients, default `None` 
-accelerator: ddp 
+accelerator: null   
 
 min_epochs: 1
 max_epochs: 1000

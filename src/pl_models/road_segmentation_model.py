@@ -21,6 +21,7 @@ class RoadSegmentationModel(pl.LightningModule):
         self.model = UNET(
             in_channels=self.hparams.in_channels, out_channels=self.hparams.out_channels
         )
+        # self.model = torch.nn.Conv2d(in_channels, out_channels, kernel_size=1)
 
         self.loss = torch.nn.BCEWithLogitsLoss()
 
@@ -42,7 +43,7 @@ class RoadSegmentationModel(pl.LightningModule):
     ) -> Dict[str, torch.Tensor]:
         loss, preds, targets = self.step(batch)
         # acc = self.train_accuracy(preds, targets)
-        self.log("train/loss", loss, on_step=False, on_epoch=True, prog_bar=False)
+        self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
         # self.log("train/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
         return {"loss": loss}
 
@@ -64,7 +65,7 @@ class RoadSegmentationModel(pl.LightningModule):
             torchvision.utils.make_grid(preds),
             "predicted images",
         )
-        self.log("val/loss", loss, on_step=False, on_epoch=True, prog_bar=False)
+        self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
         # self.log("val/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
         return {"loss": loss}
 

@@ -5,9 +5,6 @@ defaults:
   - optimizer: adam.yaml 
   - callbacks: default_callbacks.yaml
   - logger: comet.yaml 
-  # Enable color logging
-  - override hydra/hydra_logging: colorlog
-  - override hydra/job_logging: colorlog 
 
 work_dir: ${hydra:runtime.cwd}
 data_dir: ${work_dir}/data 

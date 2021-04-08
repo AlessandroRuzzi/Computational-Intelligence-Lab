@@ -5,7 +5,7 @@ model_checkpoint:
     save_last: True         # additionaly always save model from last epoch
     mode: "max"             # can be "max" or "min"
     verbose: False
-    dirpath: '${work_dir}/ckpts'
+    dirpath: 'ckpts/'
     filename: '{epoch:02d}-{val_acc:.2f}'
 
 early_stopping:

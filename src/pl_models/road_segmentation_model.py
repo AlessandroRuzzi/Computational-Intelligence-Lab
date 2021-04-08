@@ -52,6 +52,7 @@ class RoadSegmentationModel(pl.LightningModule):
     ) -> Dict[str, torch.Tensor]:
         loss, preds, targets = self.step(batch)
         # acc = self.val_accuracy(preds, targets)
+
         log_image(
             self.logger[0].experiment,
             torchvision.utils.make_grid(batch[0]),
@@ -65,6 +66,7 @@ class RoadSegmentationModel(pl.LightningModule):
             torchvision.utils.make_grid(preds),
             "predicted images",
         )
+
         self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
         # self.log("val/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
         return {"loss": loss}

@@ -6,7 +6,7 @@ num_workers: 4
 pin_memory: False
 
 defaults:
-  - transforms: default_transform.yaml
+  - transforms: composition_example.yaml
 
 
 

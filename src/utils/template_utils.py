@@ -192,5 +192,5 @@ def imshow(
 
 def log_image(experiment: Any, image: torch.Tensor, title: str) -> None:
     image = torchvision.utils.make_grid(image)
-    image = image.numpy().transpose((1, 2, 0))
+    image = image.permute(1, 2, 0)
     experiment.log_image(image, title)

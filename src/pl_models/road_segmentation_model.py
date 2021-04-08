@@ -83,7 +83,7 @@ class RoadSegmentationModel(pl.LightningModule):
         loss, preds, targets = self.step(batch)
 
         self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
-        self.log_metric("train", preds, targets)
+        self.log_metrics("train", preds, targets)
 
         return {"loss": loss}
 
@@ -94,7 +94,7 @@ class RoadSegmentationModel(pl.LightningModule):
         loss, preds, targets = self.step(batch)
         # acc = self.val_accuracy(preds, targets)
         self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
-        self.log_metric("val", preds, targets)
+        self.log_metrics("val", preds, targets)
         self.log_images(x, y, preds)
 
         return {"loss": loss}

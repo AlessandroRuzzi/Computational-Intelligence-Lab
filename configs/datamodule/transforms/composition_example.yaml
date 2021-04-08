@@ -1,22 +1,26 @@
 _target_: src.datasets.transforms.compose.Compose 
 transforms:  
-  - _target_: src.datasets.transforms.random_choice_compose.RandomChoiceCompose # Picks one of the following transforms at random 
+
+  - _target_: src.datasets.transforms.random_choice_compose.RandomChoiceCompose # Random choiche of deformations  
     transforms: 
+
       - _target_: src.datasets.transforms.random_flip.RandomFlip # Randomly flips the image in one direction 
 
       - _target_: src.datasets.transforms.random_affine.RandomAffine # Randomly applies an affine transformation to the image 
-        degrees: [30, 30]  
+        degrees: [-180.0, 180.0] # Rotate between -180 and 180 degrees 
+        scale: [.9, 1.1] # Scale from 90% to 110%
+        shear: [-10.0, 10.0] # Between -10 and 10 degrees of shear 
+        translate: [0.1, 0.1] # Translate +/- 10% of the image in both x and y direction
 
+      - _target_: src.datasets.transforms.random_perspective.RandomPerspective # Randomly applies an affine transformation to the image 
+        distortion_scale: 0.1
+      
       - _target_: src.datasets.transforms.compose.Compose  # Randomly crops part of the image and resizes it to original size
         transforms:
           - _target_: src.datasets.transforms.random_crop.RandomCrop 
+            size: [200, 200]
           - _target_: src.datasets.transforms.resize.Resize
-            size: [400, 400] 
-
-      - _target_: src.datasets.transforms.distinct.Distinct # Applies only a grayscale transform on the first image
-        transforms: 
-          - _target_: torchvision.transforms.Grayscale
-            num_output_channels: 3 
+            size: [400, 400]
 
       - _target_: src.datasets.transforms.distinct.Distinct # Applies only an erasing transform on the first image 
         transforms:
@@ -25,10 +29,28 @@ transforms:
               - _target_: torchvision.transforms.ToTensor 
               - _target_: torchvision.transforms.RandomErasing 
                 p: 1.0 
+                
               - _target_: torchvision.transforms.ToPILImage 
 
       - _target_: src.datasets.transforms.identity.Identity # Do nothing, i.e. keep the original image
 
+  - _target_: src.datasets.transforms.random_choice_compose.RandomChoiceCompose # Random choice of color transformations 
+    transforms: 
+
+      - _target_: src.datasets.transforms.distinct.Distinct # Applies only a grayscale transform on the first image
+        transforms: 
+          - _target_: torchvision.transforms.Grayscale
+            num_output_channels: 3 
+      
+      - _target_: src.datasets.transforms.distinct.Distinct # Randomly modifies the color 
+        transforms: 
+          - _target_: torchvision.transforms.ColorJitter
+            brightness: 0.4
+            contrast: 0.4
+            saturation: 0.4
+
+      - _target_: src.datasets.transforms.identity.Identity # Do nothing, i.e. keep the original image color 
+    
   - _target_: src.datasets.transforms.to_tensor.ToTensor # At the end convert everything to tensor, TODO: normalize?
 
         

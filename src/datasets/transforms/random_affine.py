@@ -14,8 +14,8 @@ class RandomAffine:
         img_size: List[int] = None,
         degrees: List[float] = None,
         translate: List[float] = None,
-        scale_ranges: List[float] = None,
-        shears: List[float] = None,
+        scale: List[float] = None,
+        shear: List[float] = None,
     ) -> None:
         if img_size is None:
             img_size = [400, 400]
@@ -24,17 +24,17 @@ class RandomAffine:
         self.img_size = img_size
         self.degrees = degrees
         self.translate = translate
-        self.scale_ranges = scale_ranges
-        self.shears = shears
+        self.scale = scale
+        self.shear = shear
 
     def __call__(self, *inputs: Any) -> Any:
         outputs = list(inputs)
 
         i, j, w, h, = transforms.RandomAffine.get_params(
             self.degrees,
-            translate=None,
-            scale_ranges=None,
-            shears=None,
+            translate=self.translate,
+            scale_ranges=self.scale,
+            shears=self.shear,
             img_size=self.img_size,
         )
 

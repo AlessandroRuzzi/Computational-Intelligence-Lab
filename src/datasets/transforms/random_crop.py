@@ -9,8 +9,8 @@ class RandomCrop:
     Crops a random part of the image.
     """
 
-    def __init__(self, output_size: Tuple[int, int] = (200, 200)) -> None:
-        self.output_size = output_size
+    def __init__(self, size: Tuple[int, int] = (200, 200)) -> None:
+        self.output_size = size
 
     def __call__(self, *inputs: Any) -> Any:
         outputs = list(inputs)

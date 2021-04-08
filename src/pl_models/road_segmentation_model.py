@@ -57,7 +57,7 @@ class RoadSegmentationModel(pl.LightningModule):
 
         batch_x = x
         batch_y = y.expand(-1, 3, -1, -1)
-        batch_preds = preds.expand(-1, 3, -1, -1)
+        # batch_preds = preds.expand(-1, 3, -1, -1)
         batch_preds_sigmoid = torch.sigmoid(preds).expand(-1, 3, -1, -1)
         batch_preds_sigmoid_treshold = (torch.sigmoid(preds) > 0.5).expand(
             -1, 3, -1, -1
@@ -67,7 +67,6 @@ class RoadSegmentationModel(pl.LightningModule):
             (
                 batch_x,
                 batch_y,
-                batch_preds,
                 batch_preds_sigmoid,
                 batch_preds_sigmoid_treshold,
             ),

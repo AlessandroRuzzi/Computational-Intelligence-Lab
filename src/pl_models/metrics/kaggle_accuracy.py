@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List
 
 import torch
 import torch.nn as nn
@@ -8,9 +8,9 @@ class KaggleAccuracy(nn.Module):
     def __init__(self, patch_size: int = 16) -> None:
         super(KaggleAccuracy, self).__init__()
         self.patch_size = patch_size
-        self.accuracy = 0
+        self.accuracy: Any = 0
 
-    def forward(self, preds : List[torch.Tensor],y : List[torch.Tensor]) -> float:
+    def forward(self, preds: List[torch.Tensor], y: List[torch.Tensor]) -> float:
         self.accuracy = 0
         y_true = []
         y_preds = []
@@ -43,8 +43,9 @@ class KaggleAccuracy(nn.Module):
             y_preds[i] = torch.where(
                 torch.sum(y_preds[i], dim=(2, 4)) / (self.patch_size ** 2) > 0.25, 1, 0
             )
-            print(y_preds[i])
+            # print(y_preds[i])
             self.accuracy += torch.sum(y_true[i] == y_preds[i]) / torch.sum(
                 torch.ones_like(y_true[i])
             )
-        return self.accuracy / len(y)
+            len_y: Any = len(y)
+        return self.accuracy / len_y

@@ -8,6 +8,7 @@ from torch.optim import Optimizer
 
 from src.architectures.backboned_unet import Unet
 from src.pl_models.metrics.dice_loss import BinaryDiceLoss
+from src.pl_models.metrics.kaggle_accuracy import KaggleAccuracy
 
 # from src.architectures.unet import UNET
 
@@ -30,7 +31,7 @@ class RoadSegmentationModel(pl.LightningModule):
 
         self.loss = torch.nn.BCEWithLogitsLoss()
 
-        self.metrics = [("dice", BinaryDiceLoss())]
+        self.metrics = [("kaggle", KaggleAccuracy()), ("dice", BinaryDiceLoss())]
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)

@@ -4,10 +4,10 @@ import pytorch_lightning as pl
 import torch
 import torchvision
 from hydra.utils import instantiate
-from pytorch_lightning.metrics.classification import Accuracy
 from torch.optim import Optimizer
 
 from src.architectures.backboned_unet import Unet
+from src.pl_models.metrics.dice_loss import BinaryDiceLoss
 
 # from src.architectures.unet import UNET
 
@@ -30,9 +30,7 @@ class RoadSegmentationModel(pl.LightningModule):
 
         self.loss = torch.nn.BCEWithLogitsLoss()
 
-        self.train_accuracy = Accuracy()
-        self.val_accuracy = Accuracy()
-        self.test_accuracy = Accuracy()
+        self.metrics = [("dice", BinaryDiceLoss())]
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)
@@ -43,22 +41,19 @@ class RoadSegmentationModel(pl.LightningModule):
         loss = self.loss(y_hat, y)
         return loss, y_hat, y
 
-    def training_step(
-        self, batch: List[torch.Tensor], batch_idx: int
-    ) -> Dict[str, torch.Tensor]:
-        loss, preds, targets = self.step(batch)
-        # acc = self.train_accuracy(preds, targets)
-        self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
-        # self.log("train/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
-        return {"loss": loss}
+    def log_metrics(
+        self, stage: "str", preds: torch.Tensor, targets: torch.Tensor
+    ) -> None:
+        for metric_name, metric in self.metrics:
+            self.log(
+                f"{stage}_{metric_name}",
+                metric(preds, targets),
+                on_step=False,
+                on_epoch=True,
+                prog_bar=False,
+            )
 
-    def validation_step(
-        self, batch: List[torch.Tensor], batch_id: int
-    ) -> Dict[str, torch.Tensor]:
-        x, y = batch
-        loss, preds, targets = self.step(batch)
-        # acc = self.val_accuracy(preds, targets)
-
+    def log_images(self, x: torch.Tensor, y: torch.Tensor, preds: torch.Tensor) -> None:
         batch_x = x
         batch_y = y.expand(-1, 3, -1, -1)
         # batch_preds = preds.expand(-1, 3, -1, -1)
@@ -79,10 +74,29 @@ class RoadSegmentationModel(pl.LightningModule):
 
         img_grid = torchvision.utils.make_grid(block)
         img_grid = img_grid.permute((1, 2, 0))
+
         self.logger[0].experiment.log_image(img_grid.cpu(), "Segmented roads")
 
+    def training_step(
+        self, batch: List[torch.Tensor], batch_idx: int
+    ) -> Dict[str, torch.Tensor]:
+        loss, preds, targets = self.step(batch)
+
+        self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
+        self.log_metric("train", preds, targets)
+
+        return {"loss": loss}
+
+    def validation_step(
+        self, batch: List[torch.Tensor], batch_id: int
+    ) -> Dict[str, torch.Tensor]:
+        x, y = batch
+        loss, preds, targets = self.step(batch)
+        # acc = self.val_accuracy(preds, targets)
         self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
-        # self.log("val/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
+        self.log_metric("val", preds, targets)
+        self.log_images(x, y, preds)
+
         return {"loss": loss}
 
     def test_step(self, batch: torch.Tensor, batch_id: int) -> Dict[str, torch.Tensor]:

@@ -8,7 +8,8 @@ from pytorch_lightning.metrics.classification import Accuracy
 from torch.optim import Optimizer
 
 from src.architectures.unet import UNET
-from src.utils.template_utils import log_image
+
+# from src.utils.template_utils import log_image
 
 
 class RoadSegmentationModel(pl.LightningModule):
@@ -50,22 +51,32 @@ class RoadSegmentationModel(pl.LightningModule):
     def validation_step(
         self, batch: List[torch.Tensor], batch_id: int
     ) -> Dict[str, torch.Tensor]:
+        x, y = batch
         loss, preds, targets = self.step(batch)
         # acc = self.val_accuracy(preds, targets)
 
-        log_image(
-            self.logger[0].experiment,
-            torchvision.utils.make_grid(batch[0]),
-            "input images",
+        batch_x = x
+        batch_y = y.expand(-1, 3, -1, -1)
+        batch_preds = preds.expand(-1, 3, -1, -1)
+        batch_preds_sigmoid = torch.sigmoid(preds).expand(-1, 3, -1, -1)
+        batch_preds_sigmoid_treshold = (torch.sigmoid(preds) > 0.5).expand(
+            -1, 3, -1, -1
         )
-        log_image(
-            self.logger[0].experiment, torchvision.utils.make_grid(batch[1]), "labels"
+
+        block = torch.cat(
+            (
+                batch_x,
+                batch_y,
+                batch_preds,
+                batch_preds_sigmoid,
+                batch_preds_sigmoid_treshold,
+            ),
+            0,
         )
-        log_image(
-            self.logger[0].experiment,
-            torchvision.utils.make_grid(preds),
-            "predicted images",
-        )
+
+        img_grid = torchvision.utils.make_grid(block)
+        img_grid = img_grid.permute((1, 2, 0))
+        self.logger[0].experiment.log_image(img_grid.cpu(), "Segmented roads")
 
         self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
         # self.log("val/acc", acc, on_step=False, on_epoch=True, prog_bar=True)

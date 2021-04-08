@@ -6,13 +6,9 @@ import torchvision
 from hydra.utils import instantiate
 from torch.optim import Optimizer
 
-from src.architectures.backboned_unet import Unet
+from src.architectures.unet import UNET
 from src.pl_models.metrics.dice_loss import BinaryDiceLoss
 from src.pl_models.metrics.kaggle_accuracy import KaggleAccuracy
-
-# from src.architectures.unet import UNET
-
-# from src.utils.template_utils import log_image
 
 
 class RoadSegmentationModel(pl.LightningModule):
@@ -23,11 +19,10 @@ class RoadSegmentationModel(pl.LightningModule):
 
         self.save_hyperparameters()
 
-        # self.model = UNET(
-        #   in_channels=self.hparams.in_channels, out_channels=self.hparams.out_channels
-        # )
+        self.model = UNET(in_channels=in_channels, out_channels=out_channels)
+
         # self.model = torch.nn.Conv2d(in_channels, out_channels, kernel_size=1)
-        self.model = Unet(backbone_name="resnet152", classes=2)
+        # self.model = Unet(backbone_name="resnet152", classes=2)
 
         self.loss = torch.nn.BCEWithLogitsLoss()
 
@@ -84,7 +79,7 @@ class RoadSegmentationModel(pl.LightningModule):
         loss, preds, targets = self.step(batch)
 
         self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
-        self.log_metrics("train", preds, targets)
+        self.log_metrics("train", (torch.sigmoid(preds) > 0.5), targets)
 
         return {"loss": loss}
 
@@ -95,7 +90,7 @@ class RoadSegmentationModel(pl.LightningModule):
         loss, preds, targets = self.step(batch)
         # acc = self.val_accuracy(preds, targets)
         self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
-        self.log_metrics("val", preds, targets)
+        self.log_metrics("val", (torch.sigmoid(preds) > 0.5), targets)
         self.log_images(x, y, preds)
 
         return {"loss": loss}

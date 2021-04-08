@@ -49,6 +49,7 @@ def train(config: DictConfig) -> None:
 
     # Send config params to loggers
     log.info("Logging hyperparameters.")
+
     template_utils.log_hyperparameters(
         config=config,
         model=model,

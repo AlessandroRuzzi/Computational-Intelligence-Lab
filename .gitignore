@@ -11,3 +11,5 @@ src/datasets/data/*
 !data/.gitkeep
 logs/*
 !logs/.gitkeep
+ckpts/*
+!ckpts/.gitkeep

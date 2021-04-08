@@ -97,7 +97,7 @@ class PreProcessor:
 
         print(mask.shape)
         for i in range(len(mask)):
-            if mask[i] > 0.1:
+            if mask[i] > 0.5:
                 mask[i] = 1
             else:
                 mask[i] = 0

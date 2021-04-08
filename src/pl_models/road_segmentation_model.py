@@ -23,7 +23,7 @@ class RoadSegmentationModel(pl.LightningModule):
         self.save_hyperparameters()
 
         # self.model = UNET(
-        #    in_channels=self.hparams.in_channels, out_channels=self.hparams.out_channels
+        #   in_channels=self.hparams.in_channels, out_channels=self.hparams.out_channels
         # )
         # self.model = torch.nn.Conv2d(in_channels, out_channels, kernel_size=1)
         self.model = Unet(backbone_name="resnet152", classes=2)

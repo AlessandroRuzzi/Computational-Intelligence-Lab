@@ -304,14 +304,11 @@ class UNET(nn.Module):
     def partial_unfreeze_encoder(self, layers: int) -> None:
         pass
 
-    def get_params(self, all: bool = True, cut: int = 0) -> List:
+    def get_params(self) -> List:
         params = []
         for param in self.backbone.parameters():
             params.append(param)
-        if all:
-            return params
-        else:
-            return params[:-cut]
+        return params
 
     def forward(self, *input: Any) -> torch.Tensor:
 

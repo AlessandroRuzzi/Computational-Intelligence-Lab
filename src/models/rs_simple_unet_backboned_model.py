@@ -20,4 +20,4 @@ class RSSimpleUNETBackbonedModel(RSSimpleBaseModel):
         self.model = UNET(backbone_name=backbone_name, classes=classes)
 
     def get_encoder_params(self, all: bool = True, cut: int = 0) -> List:
-        return self.model.get_params(all, cut)
+        return self.model.get_params()

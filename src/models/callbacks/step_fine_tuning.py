@@ -1,6 +1,8 @@
 import pytorch_lightning as pl
 from torch.optim import Optimizer
 
+# flake8: noqa
+
 
 class StepFineTuning(pl.callbacks.finetuning.BaseFinetuning):
     def __init__(
@@ -37,7 +39,7 @@ class StepFineTuning(pl.callbacks.finetuning.BaseFinetuning):
                 )
             elif epoch == milestone:
                 self.unfreeze_and_add_param_group(
-                    modules=pl_module.get_encoder_params()[: -self.layers[i]],
+                    modules=pl_module.get_encoder_params()[-self.layers[i] :],
                     optimizer=optimizer,
                     train_bn=self.train_bn,
                 )

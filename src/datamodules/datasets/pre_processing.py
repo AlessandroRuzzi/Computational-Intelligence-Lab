@@ -122,6 +122,8 @@ class PreProcessor:
 
 def main() -> None:
     model = UNET(backbone_name="resnext101", classes=2)
+    param = model.get_params()
+    print(len(param[-5:]))
 
 
 if __name__ == "__main__":

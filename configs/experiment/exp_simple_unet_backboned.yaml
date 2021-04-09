@@ -20,6 +20,14 @@ trainer:
   gpus: 1
   max_epochs: 100_000
 
+callbacks:
+  early_stopping:
+    monitor: "val_loss"
+  
+
+model:
+  backbone_name: resnext101
+  
 datamodule:
   batch_size: 8 
   num_workers: 0 

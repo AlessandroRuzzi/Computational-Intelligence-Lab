@@ -19,7 +19,7 @@ chmod +x leonhard_init.sh
 ```
 
 3. Create virtual environment called ``venv``: 
-4. ```console
+```console
 python -m venv venv
 ```
 

@@ -1,0 +1,25 @@
+# @package _global_
+
+# To execute this experiment run:
+# python run.py +experiment=exp_standard
+
+defaults:
+  - override /trainer: default_trainer.yaml  # choose trainer from 'configs/trainer/'
+  - override /model: rs_simple_base_model.yaml 
+  - override /datamodule: rs_simple_datamodule.yaml 
+  - override /optimizer: adam.yaml 
+  - override /callbacks: default_callbacks.yaml
+  - override /logger: comet.yaml 
+  # Color logging 
+  - override /hydra/hydra_logging: colorlog
+  - override /hydra/job_logging: colorlog
+
+seed: 12345
+
+trainer: 
+  gpus: 0
+  max_epochs: 100_000
+
+datamodule:
+  batch_size: 8 
+  num_workers: 0 

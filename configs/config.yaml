@@ -1,3 +1,5 @@
+# @package _global_
+
 defaults:
   - trainer: default_trainer.yaml
   - model: rs_simple_base_model.yaml 

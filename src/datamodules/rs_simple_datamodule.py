@@ -4,11 +4,11 @@ import pytorch_lightning as pl
 import torchvision
 from torch.utils.data import DataLoader, random_split
 
-from src.datasets.road_segmentation_dataset import RoadSegmentationDataset
-from src.datasets.transforms.to_tensor import ToTensor
+from src.datamodules.datasets.rs_kaggle_dataset import RSKaggleDataset
+from src.datamodules.transforms.to_tensor import ToTensor
 
 
-class RoadSegmentationDataModule(pl.LightningDataModule):
+class RSSimpleDataModule(pl.LightningDataModule):
     def __init__(
         self,
         data_dir: str = "data/",
@@ -47,15 +47,15 @@ class RoadSegmentationDataModule(pl.LightningDataModule):
 
     def prepare_data(self) -> None:
         # Download data
-        RoadSegmentationDataset(self.data_dir, train=True, download=True)
-        RoadSegmentationDataset(self.data_dir, train=False, download=True)
+        RSKaggleDataset(self.data_dir, train=True, download=True)
+        RSKaggleDataset(self.data_dir, train=False, download=True)
 
     def setup(self, stage: Any = None) -> None:
         # Transform and split datasets
-        trainset = RoadSegmentationDataset(
+        trainset = RSKaggleDataset(
             self.data_dir, train=True, transforms=self.transforms_train
         )
-        testset = RoadSegmentationDataset(
+        testset = RSKaggleDataset(
             self.data_dir, train=False, transforms=self.transforms_test
         )
         self.data_train, self.data_val = random_split(trainset, self.train_val_split)

@@ -1,4 +1,4 @@
-_target_: src.pl_models.mnist_model.MNISTModel
+_target_: src.models.mnist_model.MNISTModel
 
 input_size: 784 # 28 * 28 
 hidden_size: 128

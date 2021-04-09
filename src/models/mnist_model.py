@@ -6,7 +6,7 @@ from hydra.utils import instantiate
 from pytorch_lightning.metrics.classification import Accuracy
 from torch.optim import Optimizer
 
-from src.architectures.simple_net import SimpleNet
+from src.models.architectures.simple_net import SimpleNet
 
 
 class MNISTModel(pl.LightningModule):

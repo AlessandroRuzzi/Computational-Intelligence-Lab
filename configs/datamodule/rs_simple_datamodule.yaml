@@ -1,4 +1,4 @@
-_target_: src.pl_datamodules.road_segmentation_datamodule.RoadSegmentationDataModule
+_target_: src.datamodules.rs_simple_datamodule.RSSimpleDataModule
 data_dir: ${data_dir}  # data_dir is specified in config.yaml
 batch_size: 32
 train_val_split: [80, 20]

@@ -7,7 +7,7 @@ import torch
 from PIL import Image
 
 
-class RoadSegmentationDataset(torch.utils.data.Dataset):
+class RSKaggleDataset(torch.utils.data.Dataset):
 
     kaggle_competition = "cil-road-segmentation-2021"
     kaggle_folder_train_images = "training/training/images/"

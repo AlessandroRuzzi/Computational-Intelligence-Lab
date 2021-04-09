@@ -1,7 +1,7 @@
 defaults:
   - trainer: default_trainer.yaml
-  - model: road_segmentation_model.yaml 
-  - datamodule: road_segmentation_datamodule.yaml 
+  - model: rs_simple_base_model.yaml 
+  - datamodule: rs_simple_datamodule.yaml 
   - optimizer: adam.yaml 
   - callbacks: default_callbacks.yaml
   - logger: comet.yaml 

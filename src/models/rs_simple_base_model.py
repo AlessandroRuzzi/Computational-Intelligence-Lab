@@ -6,22 +6,18 @@ import torchvision
 from hydra.utils import instantiate
 from torch.optim import Optimizer
 
-from src.architectures.backboned_unet import Unet
-from src.pl_models.metrics.dice_loss import BinaryDiceLoss
-from src.pl_models.metrics.kaggle_accuracy import KaggleAccuracy
+from src.models.metrics.dice_loss import BinaryDiceLoss
+from src.models.metrics.kaggle_accuracy import KaggleAccuracy
 
 
-class RoadSegmentationModel(pl.LightningModule):
+class RSSimpleBaseModel(pl.LightningModule):
     def __init__(
         self, optimizer: Optimizer, in_channels: int = 3, out_channels: int = 1
     ) -> None:
         super().__init__()
 
         self.save_hyperparameters()
-
-        # self.model = UNET(in_channels=in_channels, out_channels=out_channels)
-        # self.model = torch.nn.Conv2d(in_channels, out_channels, kernel_size=1)
-        self.model = Unet(backbone_name="resnet152", classes=2)
+        self.model = torch.nn.Conv2d(in_channels, out_channels, kernel_size=1)
 
         self.loss = torch.nn.BCEWithLogitsLoss()
 

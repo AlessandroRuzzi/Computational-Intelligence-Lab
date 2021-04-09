@@ -1,5 +1,6 @@
 from typing import Any, Tuple
 
+# flake8: noqa
 import torch
 import torch.nn as nn
 import torchvision.transforms.functional as TF
@@ -100,6 +101,8 @@ def get_backbone(name: str, pretrained: bool = True) -> Any:
         backbone = models.densenet169(pretrained=True).features
     elif name == "densenet201":
         backbone = models.densenet201(pretrained=True).features
+    elif name == "resnext101":
+        backbone = models.resnext101_32x8d(pretrained=True)
     elif name == "unet_encoder":
         backbone = UnetEncoder(3)
     else:
@@ -109,6 +112,9 @@ def get_backbone(name: str, pretrained: bool = True) -> Any:
 
     # specifying skip feature and output names
     if name.startswith("resnet"):
+        feature_names = [None, "relu", "layer1", "layer2", "layer3"]
+        backbone_output = "layer4"
+    elif name.startswith("resnext"):
         feature_names = [None, "relu", "layer1", "layer2", "layer3"]
         backbone_output = "layer4"
     elif name == "vgg16":

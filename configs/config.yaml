@@ -10,6 +10,8 @@ defaults:
 
 work_dir: ${hydra:runtime.cwd}
 data_dir: ${work_dir}/data 
+logs_dir: ${work_dir}/logs
+
 debug: False # This uses pytorch-lighning fast_dev_run
 print_config: True # Pretty prints configs at the start of run 
 disable_warnings: False 
@@ -17,7 +19,7 @@ disable_warnings: False
 hydra:
   # Output paths for hydra logs
   run:
-    dir: logs/runs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ${logs_dir}/runs/${now:%Y-%m-%d}/${now:%H-%M-%S}
   sweep:
-    dir: logs/multiruns/${now:%Y-%m-%d_%H-%M-%S}
+    dir: ${logs_dir}/multiruns/${now:%Y-%m-%d_%H-%M-%S}
     subdir: ${hydra.job.num}

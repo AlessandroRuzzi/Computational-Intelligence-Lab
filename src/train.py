@@ -28,7 +28,7 @@ def train(config: DictConfig) -> None:
 
     # Init callbacks (e.g. checkpoints, early stopping)
     callbacks = []
-    if "callback" in config:
+    if "callbacks" in config:
         for _, cb_conf in config["callbacks"].items():
             if "_target_" in cb_conf:
                 log.info(f"Instantiating callback <{cb_conf._target_}>.")

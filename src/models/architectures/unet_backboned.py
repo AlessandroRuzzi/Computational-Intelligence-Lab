@@ -1,4 +1,4 @@
-from typing import Any, Tuple
+from typing import Any, List, Tuple
 
 # flake8: noqa
 import torch
@@ -296,6 +296,22 @@ class UNET(nn.Module):
 
         for param in self.backbone.parameters():
             param.requires_grad = False
+
+    def unfreeze_encoder(self) -> None:
+        for param in self.backbone.parameters():
+            param.requires_grad = True
+
+    def partial_unfreeze_encoder(self, layers: int) -> None:
+        pass
+
+    def get_params(self, all: bool = True, cut: int = 0) -> List:
+        params = []
+        for param in self.backbone.parameters():
+            params.append(param)
+        if all:
+            return params
+        else:
+            return params[:-cut]
 
     def forward(self, *input: Any) -> torch.Tensor:
 

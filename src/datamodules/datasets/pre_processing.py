@@ -55,6 +55,9 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 """
+from src.models.architectures.unet_backboned import UNET
+
+"""
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
@@ -63,7 +66,6 @@ import torchvision
 from torchvision import datasets, transforms
 from torchvision.datasets.vision import StandardTransform
 
-from src.datasets.road_segmentation_dataset import RoadSegmentationDataset
 from src.utils.template_utils import imshow
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -115,16 +117,12 @@ class PreProcessor:
         imshow(mask)
 
         print(image.size(), mask.size(), image.dtype, mask.dtype)
+"""
 
 
 def main() -> None:
-    PreProcessor()
+    model = UNET(backbone_name="resnext101", classes=2)
 
 
 if __name__ == "__main__":
     main()
-
-
-# find what type of preprocessing we can do
-# see how they flatten images in the notebooks
-#

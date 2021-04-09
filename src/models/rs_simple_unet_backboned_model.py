@@ -1,3 +1,5 @@
+from typing import List
+
 from torch.optim import Optimizer
 
 from src.models.architectures.unet_backboned import UNET
@@ -16,3 +18,6 @@ class RSSimpleUNETBackbonedModel(RSSimpleBaseModel):
         super().__init__(optimizer, in_channels, out_channels)
 
         self.model = UNET(backbone_name=backbone_name, classes=classes)
+
+    def get_encoder_params(self, all: bool = True, cut: int = 0) -> List:
+        return self.model.get_params(all, cut)

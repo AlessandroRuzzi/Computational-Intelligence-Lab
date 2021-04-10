@@ -22,7 +22,7 @@ trainer:
 
 callbacks:
   early_stopping:
-    monitor: "val_loss"
+    monitor: "val_kaggle"
   
 
 model:

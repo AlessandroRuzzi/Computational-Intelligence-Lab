@@ -13,6 +13,7 @@ class RSKaggleDataset(torch.utils.data.Dataset):
     kaggle_folder_train_images = "training/training/images/"
     kaggle_folder_train_masks = "training/training/groundtruth/"
     kaggle_folder_test_images = "test_images/test_images/"
+    kaggle_file_test_indeces = "_kaggle_test_indeces.pt"
 
     @property
     def folder_raw(self) -> str:
@@ -46,6 +47,7 @@ class RSKaggleDataset(torch.utils.data.Dataset):
         self.transforms = transforms
         self.images: List[str] = []
         self.masks: List[str] = []
+        self.kaggle_test_indeces: torch.Tensor = torch.tensor([])
 
         if download:
             self.download()
@@ -83,6 +85,7 @@ class RSKaggleDataset(torch.utils.data.Dataset):
         zipdata = zipfile.ZipFile(source_zip)
         # Extract either train or test images and rename them.
         test_index = 0
+        kaggle_test_indeces = torch.tensor([])
         for zipinfo in zipdata.infolist():
             img_name = zipinfo.filename
             if self.train:
@@ -104,9 +107,20 @@ class RSKaggleDataset(torch.utils.data.Dataset):
                 if img_name.startswith(self.kaggle_folder_test_images):
                     # For some reason the first image has number 7...
                     zipinfo.filename = f"{test_index:03d}_image.png"
+                    kaggle_index = torch.tensor([self._img_number_from_name(img_name)])
+                    kaggle_test_indeces = torch.cat(
+                        (kaggle_test_indeces, kaggle_index), 0
+                    )
                     zipdata.extract(zipinfo, self.folder_test)
+
                     self.images.append(zipinfo.filename)
                     test_index += 1
+
+        if not self.train:
+            torch.save(
+                kaggle_test_indeces,
+                os.path.join(self.folder_test, self.kaggle_file_test_indeces),
+            )
 
     def process(self) -> None:
 
@@ -129,6 +143,10 @@ class RSKaggleDataset(torch.utils.data.Dataset):
                 if "mask" in f
             ]
         else:
+            self.kaggle_test_indeces = torch.load(
+                os.path.join(self.folder_test, self.kaggle_file_test_indeces)
+            )
+
             folder_test_files = [
                 f
                 for f in os.listdir(self.folder_test)
@@ -158,9 +176,9 @@ class RSKaggleDataset(torch.utils.data.Dataset):
             image = Image.open(self.images[index]).convert("RGB")
 
             if self.transforms is not None:
-                return self.transforms(image)
+                image = self.transforms(image)
 
-            return image
+            return image, self.kaggle_test_indeces[index]
 
     def __len__(self) -> int:
         return len(self.images)

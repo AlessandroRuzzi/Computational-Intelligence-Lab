@@ -1,3 +1,4 @@
+import os
 from typing import Any, Dict, List, Sequence, Tuple, Union
 
 import pytorch_lightning as pl
@@ -5,6 +6,7 @@ import torch
 import torchvision
 from hydra.utils import instantiate
 from torch.optim import Optimizer
+from torchvision.utils import save_image
 
 from src.models.metrics.dice_loss import BinaryDiceLoss
 from src.models.metrics.kaggle_accuracy import KaggleAccuracy
@@ -12,7 +14,11 @@ from src.models.metrics.kaggle_accuracy import KaggleAccuracy
 
 class RSSimpleBaseModel(pl.LightningModule):
     def __init__(
-        self, optimizer: Optimizer, in_channels: int = 3, out_channels: int = 1
+        self,
+        optimizer: Optimizer,
+        in_channels: int = 3,
+        out_channels: int = 1,
+        dir_preds_test: str = "path",
     ) -> None:
         super().__init__()
 
@@ -44,7 +50,9 @@ class RSSimpleBaseModel(pl.LightningModule):
                 prog_bar=False,
             )
 
-    def log_images(self, x: torch.Tensor, y: torch.Tensor, preds: torch.Tensor) -> None:
+    def log_images(
+        self, title: str, x: torch.Tensor, y: torch.Tensor, preds: torch.Tensor
+    ) -> None:
         batch_x = x
         batch_y = y.expand(-1, 3, -1, -1)
         # batch_preds = preds.expand(-1, 3, -1, -1)
@@ -66,7 +74,7 @@ class RSSimpleBaseModel(pl.LightningModule):
         img_grid = torchvision.utils.make_grid(block)
         img_grid = img_grid.permute((1, 2, 0))
 
-        self.logger[0].experiment.log_image(img_grid.cpu(), "Segmented roads")
+        self.logger[0].experiment.log_image(img_grid.cpu(), title)
 
     def training_step(
         self, batch: List[torch.Tensor], batch_idx: int
@@ -86,13 +94,23 @@ class RSSimpleBaseModel(pl.LightningModule):
         # acc = self.val_accuracy(preds, targets)
         self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
         self.log_metrics("val", (torch.sigmoid(preds) > 0.5), targets)
-        self.log_images(x, y, preds)
+        self.log_images("Validation Batch", x, y, preds)
 
         return {"loss": loss}
 
     def test_step(self, batch: torch.Tensor, batch_id: int) -> Dict[str, torch.Tensor]:
-        x = batch
-        self.forward(x)
+        x, kaggle_ids = batch
+        preds = (torch.sigmoid(self.forward(x)) > 0.5).float()
+
+        # Save predictions images to folder
+        os.makedirs(self.hparams["dir_preds_test"], exist_ok=True)
+
+        for i in range(x.shape[0]):
+            save_image(
+                preds[i],
+                os.path.join(self.hparams["dir_preds_test"], f"{kaggle_ids[i]}.png"),
+            )
+
         return {}
 
     def configure_optimizers(

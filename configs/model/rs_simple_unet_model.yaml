@@ -1,3 +1,4 @@
 _target_: src.models.rs_simple_unet_model.RSSimpleUNETModel
 in_channels: 3
 out_channels: 1
+dir_preds_test: ${logs_dir}/predictions/${now:%Y-%m-%d}/${now:%H-%M-%S}

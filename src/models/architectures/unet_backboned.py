@@ -115,7 +115,9 @@ def get_backbone(name: str, pretrained: bool = True) -> Any:
         feature_names = [None, "relu", "layer1", "layer2", "layer3"]
         backbone_output = "layer4"
     elif name.startswith("resnext"):
-        feature_names = [None, "relu", "layer1", "layer2", "layer3"]
+        for name, child in backbone.named_children():
+            print(name)
+        feature_names = [None, "conv1", "relu", "layer1", "layer2", "layer3"]
         backbone_output = "layer4"
     elif name == "vgg16":
         # TODO: consider using a 'bridge' for VGG models, there is just a MaxPool between last skip and backbone output
@@ -240,7 +242,7 @@ class UNET(nn.Module):
         pretrained: bool = True,
         encoder_freeze: bool = False,
         classes: int = 2,
-        decoder_filters: Tuple[int, ...] = (256, 128, 64, 32, 16),
+        decoder_filters: Tuple[int, ...] = (1024, 512, 256, 128, 64, 32, 16),
         parametric_upsampling: bool = True,
         shortcut_features: str = "default",
         decoder_use_batchnorm: bool = True,

@@ -25,13 +25,9 @@ class StepFineTuning(pl.callbacks.finetuning.BaseFinetuning):
         optimizer: Optimizer,
         opt_idx: int,
     ) -> None:
-        i = 0
 
-        for milestone in self.milestones:
-            if (
-                epoch == milestone
-                and milestone == self.milestones[len(self.milestones)]
-            ):
+        for index, milestone in enumerate(self.milestones):
+            if epoch == milestone and milestone == self.milestones[-1]:
                 self.unfreeze_and_add_param_group(
                     modules=pl_module.get_encoder_params(),
                     optimizer=optimizer,
@@ -39,9 +35,7 @@ class StepFineTuning(pl.callbacks.finetuning.BaseFinetuning):
                 )
             elif epoch == milestone:
                 self.unfreeze_and_add_param_group(
-                    modules=pl_module.get_encoder_params()[-self.layers[i] :],
+                    modules=pl_module.get_encoder_params()[-self.layers[index] :],
                     optimizer=optimizer,
                     train_bn=self.train_bn,
                 )
-
-            i += 1

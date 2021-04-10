@@ -1,0 +1,37 @@
+# @package _global_
+
+# To execute this experiment run:
+# python run.py +experiment=exp_standard
+
+defaults:
+  - override /trainer: default_trainer.yaml  # choose trainer from 'configs/trainer/'
+  - override /model: rs_simple_unet_backboned_model.yaml 
+  - override /datamodule: rs_simple_datamodule.yaml 
+  - override /optimizer: adam.yaml 
+  - override /callbacks: default_callbacks.yaml
+  - override /logger: comet.yaml 
+   # Color logging 
+  - override /hydra/hydra_logging: colorlog
+  - override /hydra/job_logging: colorlog
+
+seed: 12345
+
+trainer: 
+  gpus: 1
+  max_epochs: 100_000
+
+callbacks:
+  early_stopping:
+    monitor: val_kaggle
+    patience: 500
+    mode: max 
+  step_fine_tuning:
+    _target_: src.models.callbacks.step_fine_tuning.StepFineTuning 
+    
+
+model:
+  backbone_name: resnext101
+  
+datamodule:
+  batch_size: 8 
+  num_workers: 0 

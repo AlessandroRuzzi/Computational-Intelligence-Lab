@@ -115,8 +115,6 @@ def get_backbone(name: str, pretrained: bool = True) -> Any:
         feature_names = [None, "relu", "layer1", "layer2", "layer3"]
         backbone_output = "layer4"
     elif name.startswith("resnext"):
-        for name, child in backbone.named_children():
-            print(name)
         feature_names = [None, "conv1", "relu", "layer1", "layer2", "layer3"]
         backbone_output = "layer4"
     elif name == "vgg16":

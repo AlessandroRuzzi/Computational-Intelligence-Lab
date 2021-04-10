@@ -22,8 +22,9 @@ trainer:
 
 callbacks:
   early_stopping:
-    monitor: "val_kaggle"
+    monitor: val_kaggle
     patience: 500
+    mode: max 
   
 
 model:

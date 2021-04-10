@@ -115,7 +115,7 @@ def get_backbone(name: str, pretrained: bool = True) -> Any:
         feature_names = [None, "relu", "layer1", "layer2", "layer3"]
         backbone_output = "layer4"
     elif name.startswith("resnext"):
-        feature_names = [None, "conv1", "relu", "layer1", "layer2", "layer3"]
+        feature_names = ["conv1", "relu", "layer1", "layer2", "layer3"]
         backbone_output = "layer4"
     elif name == "vgg16":
         # TODO: consider using a 'bridge' for VGG models, there is just a MaxPool between last skip and backbone output

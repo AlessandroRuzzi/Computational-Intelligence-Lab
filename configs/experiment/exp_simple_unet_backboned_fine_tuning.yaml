@@ -23,7 +23,7 @@ trainer:
 callbacks:
   early_stopping:
     monitor: val_kaggle
-    patience: 500
+    patience: 100
     mode: max 
   step_fine_tuning:
     _target_: src.models.callbacks.step_fine_tuning.StepFineTuning 

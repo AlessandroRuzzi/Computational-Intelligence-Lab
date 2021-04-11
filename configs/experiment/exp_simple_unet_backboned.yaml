@@ -29,7 +29,7 @@ callbacks:
     monitor: val_kaggle
     save_top_k: 2           
     save_last: True         # additionaly always save model from last epoch
-    mode: max"  
+    mode: max
   
 
 model:

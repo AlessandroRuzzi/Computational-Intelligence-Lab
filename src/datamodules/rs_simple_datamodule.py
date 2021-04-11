@@ -31,7 +31,7 @@ class RSSimpleDataModule(pl.LightningDataModule):
         self.transforms_train = transforms
         self.transforms_test = torchvision.transforms.Compose(
             [
-                torchvision.transforms.Resize((380, 380)),
+                torchvision.transforms.Resize((400, 400)),
                 torchvision.transforms.ToTensor(),
             ]
         )

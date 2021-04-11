@@ -59,6 +59,11 @@ def train(config: DictConfig) -> None:
         logger=loggers,
     )
 
+    # Run model on thest data at checkpoint by adding +test=/path/to/checkpoint
+    if "test" in config:
+        trainer.test(model=model, datamodule=datamodule, ckpt_path=config.test)
+        return
+
     # Train model
     log.info("Starting training.")
     trainer.fit(model=model, datamodule=datamodule)

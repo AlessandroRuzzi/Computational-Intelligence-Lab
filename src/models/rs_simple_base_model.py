@@ -109,7 +109,8 @@ class RSSimpleBaseModel(pl.LightningModule):
             save_image(
                 preds[i],
                 os.path.join(
-                    self.hparams["dir_preds_test"], f"satImage_{kaggle_ids[i]}.png"
+                    self.hparams["dir_preds_test"],
+                    f"satImage_{kaggle_ids[i]:03.0f}.png",
                 ),
             )
 

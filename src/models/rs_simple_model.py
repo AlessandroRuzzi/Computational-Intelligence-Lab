@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Sequence, Tuple, Union
 import pytorch_lightning as pl
 import torch
 import torchvision
-from hydra.utils import instantiate
 from torch.optim import Optimizer
 from torchvision.utils import save_image
 
@@ -12,21 +11,20 @@ from src.models.metrics.dice_loss import BinaryDiceLoss
 from src.models.metrics.kaggle_accuracy import KaggleAccuracy
 
 
-class RSSimpleBaseModel(pl.LightningModule):
+class RSSimpleModel(pl.LightningModule):
     def __init__(
         self,
-        optimizer: Optimizer,
-        in_channels: int = 3,
-        out_channels: int = 1,
+        loss: torch.nn.Module,
+        architecture: torch.nn.Module,
+        lr: float = 0.001,
         dir_preds_test: str = "path",
     ) -> None:
         super().__init__()
 
+        self.model = architecture
+        self.loss = loss
+        self.lr = lr
         self.save_hyperparameters()
-        self.model = torch.nn.Conv2d(in_channels, out_channels, kernel_size=1)
-
-        self.loss = torch.nn.BCEWithLogitsLoss()
-
         self.metrics = [("kaggle", KaggleAccuracy()), ("dice", BinaryDiceLoss())]
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -120,5 +118,8 @@ class RSSimpleBaseModel(pl.LightningModule):
     def configure_optimizers(
         self,
     ) -> Union[Optimizer, Tuple[Sequence[Optimizer], Sequence[Any]]]:
-        optim = instantiate(self.hparams.optimizer, params=self.parameters())
-        return optim
+        parameters = list(self.parameters())
+        optimizer = torch.optim.Adam(
+            list(filter(lambda p: p.requires_grad, parameters)), lr=self.lr
+        )
+        return [optimizer], []

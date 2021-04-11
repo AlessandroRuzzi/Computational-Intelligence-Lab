@@ -1,7 +1,7 @@
 # @package _global_
 
 defaults:
-  - override /model: rs_simple_unet_model.yaml 
+  - override /model/architecture: unet_backboned.yaml 
   # Color logging 
   - override /hydra/hydra_logging: colorlog
   - override /hydra/job_logging: colorlog
@@ -13,7 +13,5 @@ trainer:
   gpus: 1
 
 model:
-  _target_: src.models.rs_simple_unet_backboned_model.RSSimpleUNETBackbonedModel.load_from_checkpoint
-  backbone_name: resnext101
-  classes: 2
+  _target_: src.models.rs_simple_model.RSSimpleModel.load_from_checkpoint
   # checkpoint_path: this must be specified with +model.checkpoint_path=...

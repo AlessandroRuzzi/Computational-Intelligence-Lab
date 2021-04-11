@@ -27,7 +27,7 @@ def train(config: DictConfig) -> None:
 
     # Initialize model
     log.info(f"Instantiating model <{config.model._target_}>.")
-    model = instantiate(config.model, optimizer=config.optimizer, _recursive_=False)
+    model = instantiate(config.model)
 
     # Init callbacks (e.g. checkpoints, early stopping)
     callbacks = []

@@ -17,4 +17,4 @@ max_epochs: 100_000
 weights_summary: top
 progress_bar_refresh_rate: 1 # Every batch 
 
-terminate_on_nan: False
+terminate_on_nan: False 

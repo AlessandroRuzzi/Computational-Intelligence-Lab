@@ -1,9 +1,8 @@
 # @package _global_
 
 defaults:
-  - override /model: rs_simple_unet_model.yaml 
-  - override /model/xx: xx
-   # Color logging 
+  - override /model/architecture: unet.yaml 
+  # Color logging 
   - override /hydra/hydra_logging: colorlog
   - override /hydra/job_logging: colorlog
 

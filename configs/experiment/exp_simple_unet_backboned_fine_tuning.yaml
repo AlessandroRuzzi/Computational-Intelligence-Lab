@@ -20,4 +20,4 @@ callbacks:
   step_fine_tuning:
     _target_: src.models.callbacks.step_fine_tuning.StepFineTuning 
     
-  
+  early_stopping: none 

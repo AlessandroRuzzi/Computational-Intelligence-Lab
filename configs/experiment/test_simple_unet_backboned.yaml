@@ -1,11 +1,11 @@
 # @package _global_
 
 defaults:
-  - override /model: rs_simple_unet_backboned_model.yaml 
-   # Color logging 
+  - override /model: rs_simple_unet_model.yaml 
+  # Color logging 
   - override /hydra/hydra_logging: colorlog
   - override /hydra/job_logging: colorlog
-  
+
 test: True 
 seed: 12345
 
@@ -15,8 +15,5 @@ trainer:
 model:
   _target_: src.models.rs_simple_unet_backboned_model.RSSimpleUNETBackbonedModel.load_from_checkpoint
   backbone_name: resnext101
+  classes: 2
   # checkpoint_path: this must be specified with +model.checkpoint_path=...
-
-datamodule:
-  batch_size: 8 
-  num_workers: 0 

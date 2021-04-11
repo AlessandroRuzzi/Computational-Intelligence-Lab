@@ -1,4 +1,5 @@
 import pytorch_lightning as pl
+import torch
 from torch.optim import Optimizer
 
 # flake8: noqa
@@ -16,7 +17,7 @@ class StepFineTuning(pl.callbacks.finetuning.BaseFinetuning):
         self.train_bn = train_bn
 
     def freeze_before_training(self, pl_module: pl.LightningModule) -> None:
-        self.freeze(modules=pl_module.get_encoder_params(), train_bn=self.train_bn)
+        pl_module.freeze()
 
     def finetune_function(
         self,
@@ -25,7 +26,6 @@ class StepFineTuning(pl.callbacks.finetuning.BaseFinetuning):
         optimizer: Optimizer,
         opt_idx: int,
     ) -> None:
-
         for index, milestone in enumerate(self.milestones):
             if epoch == milestone and milestone == self.milestones[-1]:
                 self.unfreeze_and_add_param_group(

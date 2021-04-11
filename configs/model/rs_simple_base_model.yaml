@@ -1,4 +1,5 @@
 _target_: src.models.rs_simple_base_model.RSSimpleBaseModel
 in_channels: 3
 out_channels: 1
-dir_preds_test: ${logs_dir}/predictions/${now:%Y-%m-%d}/${now:%H-%M-%S}
+dir_preds_test: ${preds_dir}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+xxx: xx

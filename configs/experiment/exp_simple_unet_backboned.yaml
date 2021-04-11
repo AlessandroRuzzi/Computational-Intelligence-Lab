@@ -1,8 +1,8 @@
 # @package _global_
 
 defaults:
-  - override /model: rs_simple_unet_backboned_model.yaml 
-   # Color logging 
+  - override /model: rs_simple_unet_model.yaml 
+  # Color logging 
   - override /hydra/hydra_logging: colorlog
   - override /hydra/job_logging: colorlog
 
@@ -10,22 +10,8 @@ seed: 12345
 
 trainer: 
   gpus: 1
-  max_epochs: 100_000
 
-callbacks:
-  early_stopping:
-    monitor: val_kaggle
-    patience: 100
-    mode: max 
-  model_checkpoint:
-    monitor: val_kaggle
-    save_top_k: 2           
-    save_last: True         # additionaly always save model from last epoch
-    mode: max
-  
 model:
+  _target_: src.models.rs_simple_unet_backboned_model.RSSimpleUNETBackbonedModel
   backbone_name: resnext101
-  
-datamodule:
-  batch_size: 8 
-  num_workers: 0 
+  classes: 2

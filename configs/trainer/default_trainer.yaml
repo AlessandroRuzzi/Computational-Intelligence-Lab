@@ -11,7 +11,7 @@ precision: 32
 accelerator: null   
 
 min_epochs: 1
-max_epochs: 1000
+max_epochs: 100_000
 
 # Prints a summary of the model weights, default `top` 
 weights_summary: top

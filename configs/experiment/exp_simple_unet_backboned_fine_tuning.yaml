@@ -9,7 +9,7 @@ defaults:
 seed: 12345
 
 trainer: 
-  gpus: 0
+  gpus: 1
   max_epochs: 100_000
 
 callbacks:

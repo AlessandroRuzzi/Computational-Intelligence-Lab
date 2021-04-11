@@ -1,15 +1,10 @@
 # @package _global_
 
 # To execute this experiment run:
-# python run.py +experiment=exp_standard
+# python run.py +experiment=exp_simple_unet
 
 defaults:
-  - override /trainer: default_trainer.yaml  # choose trainer from 'configs/trainer/'
   - override /model: rs_simple_unet_model.yaml 
-  - override /datamodule: rs_simple_datamodule.yaml 
-  - override /optimizer: adam.yaml 
-  - override /callbacks: default_callbacks.yaml
-  - override /logger: comet.yaml 
    # Color logging 
   - override /hydra/hydra_logging: colorlog
   - override /hydra/job_logging: colorlog

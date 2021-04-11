@@ -6,7 +6,7 @@ from typing import List, Optional
 import comet_ml
 
 import pytorch_lightning as pl
-from hydra.utils import instantiate
+from hydra.utils import call, instantiate
 from omegaconf import DictConfig
 
 from src.utils import template_utils
@@ -60,16 +60,10 @@ def train(config: DictConfig) -> None:
         logger=loggers,
     )
 
-    # Run model on test data at checkpoint by adding +test=/checkpoint.ckpts (relative to ckpts folder)
-    if "test" in config:
-        ckpt_path = os.path.join(config.ckpts_dir, config.test)
-        log.info(f"Testing from checkpoint at: {ckpt_path}.")
-        trainer.test(model=model, datamodule=datamodule, ckpt_path=ckpt_path)
-        return
-
     # Train model
     log.info("Starting training.")
-    trainer.fit(model=model, datamodule=datamodule)
+    if "test" not in config:
+        trainer.fit(model=model, datamodule=datamodule)
 
     # Evaluate model on test set
     log.info("Starting test set evaluation.")

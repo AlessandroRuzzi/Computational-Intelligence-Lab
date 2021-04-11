@@ -22,3 +22,12 @@ class RSSimpleUNETBackbonedModel(RSSimpleBaseModel):
 
     def get_encoder_params(self, all: bool = True, cut: int = 0) -> List:
         return self.model.get_params()
+
+    def freeze(self) -> None:
+        self.model.freeze_encoder()
+
+    def unfreeze_encoder(self) -> None:
+        self.model.unfreeze_encoder()
+
+    def partial_unfreeze_encoder(self, layers: int) -> None:
+        self.model.partial_unfreeze_encoder(layers)

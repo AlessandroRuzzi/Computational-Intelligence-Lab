@@ -302,7 +302,9 @@ class UNET(nn.Module):
             param.requires_grad = True
 
     def partial_unfreeze_encoder(self, layers: int) -> None:
-        pass
+        for index, param in enumerate(self.backbone.parameters()):
+            if index > len(self.get_params()) - layers - 1:
+                param.requires_grad = True
 
     def get_params(self) -> List:
         params = []

@@ -1,6 +1,13 @@
 _target_: src.datamodules.transforms.compose.Compose 
 transforms:  
 
+  - _target_: src.datamodules.transforms.distinct.Distinct # Applies only an erasing transform on the first image 
+    transforms:
+      - _target_: src.datamodules.transforms.resize.Resize
+        size: [418, 418]
+      - _target_: src.datamodules.transforms.resize.Resize
+        size: [418, 418]
+
   - _target_: src.datamodules.transforms.random_choice_compose.RandomChoiceCompose # Random choiche of deformations  
     transforms: 
 
@@ -20,7 +27,7 @@ transforms:
           - _target_: src.datamodules.transforms.random_crop.RandomCrop 
             size: [200, 200]
           - _target_: src.datamodules.transforms.resize.Resize
-            size: [400, 400]
+            size: [418, 418]
 
       - _target_: src.datamodules.transforms.distinct.Distinct # Applies only an erasing transform on the first image 
         transforms:
@@ -51,7 +58,7 @@ transforms:
 
       - _target_: src.datamodules.transforms.identity.Identity # Do nothing, i.e. keep the original image color 
     
-  - _target_: src.datamodules.transforms.to_tensor.ToTensor # At the end convert everything to tensor, TODO: normalize?
+  - _target_: src.datamodules.transforms.to_tensor.ToTensor 
 
         
         

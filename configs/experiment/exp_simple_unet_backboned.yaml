@@ -25,6 +25,11 @@ callbacks:
     monitor: val_kaggle
     patience: 100
     mode: max 
+  model_checkpoint:
+    monitor: val_kaggle
+    save_top_k: 2           
+    save_last: True         # additionaly always save model from last epoch
+    mode: max"  
   
 
 model:

@@ -1,12 +1,8 @@
 _target_: src.datamodules.transforms.compose.Compose 
 transforms:  
 
-  - _target_: src.datamodules.transforms.distinct.Distinct # Applies only an erasing transform on the first image 
-    transforms:
-      - _target_: src.datamodules.transforms.resize.Resize
-        size: [418, 418]
-      - _target_: src.datamodules.transforms.resize.Resize
-        size: [418, 418]
+  - _target_: src.datamodules.transforms.resize.Resize
+    size: [418, 418]
 
   - _target_: src.datamodules.transforms.random_choice_compose.RandomChoiceCompose # Random choiche of deformations  
     transforms: 

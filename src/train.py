@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import List, Optional
 
 # flake8: noqa
@@ -59,9 +60,11 @@ def train(config: DictConfig) -> None:
         logger=loggers,
     )
 
-    # Run model on thest data at checkpoint by adding +test=/path/to/checkpoint
+    # Run model on test data at checkpoint by adding +test=/checkpoint.ckpts (relative to ckpts folder)
     if "test" in config:
-        trainer.test(model=model, datamodule=datamodule, ckpt_path=config.test)
+        ckpt_path = os.path.join(config.ckpts_dir, config.test)
+        log.info(f"Testing from checkpoint at: {ckpt_path}.")
+        trainer.test(model=model, datamodule=datamodule, ckpt_path=ckpt_path)
         return
 
     # Train model

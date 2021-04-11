@@ -8,8 +8,8 @@ from torch.optim import Optimizer
 class StepFineTuning(pl.callbacks.finetuning.BaseFinetuning):
     def __init__(
         self,
-        layers: tuple = (5, 30),
-        milestones: tuple = (10, 20, 30),
+        layers: tuple = (5, 30, 60, 100, 150, 250),
+        milestones: tuple = (10, 20, 30, 40, 50, 60, 70),
         train_bn: bool = False,
     ) -> None:
         self.milestones = milestones
@@ -17,7 +17,7 @@ class StepFineTuning(pl.callbacks.finetuning.BaseFinetuning):
         self.train_bn = train_bn
 
     def freeze_before_training(self, pl_module: pl.LightningModule) -> None:
-        pl_module.freeze()
+        pl_module.model.freeze_encoder()
 
     def finetune_function(
         self,
@@ -28,6 +28,6 @@ class StepFineTuning(pl.callbacks.finetuning.BaseFinetuning):
     ) -> None:
         for index, milestone in enumerate(self.milestones):
             if epoch == milestone and milestone == self.milestones[-1]:
-                pl_module.unfreeze_encoder()
+                pl_module.model.unfreeze_encoder()
             elif epoch == milestone:
-                pl_module.partial_unfreeze_encoder(self.layers[index])
+                pl_module.model.partial_unfreeze_encoder(self.layers[index])

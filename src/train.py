@@ -60,17 +60,27 @@ def train(config: DictConfig) -> None:
         logger=loggers,
     )
 
-    # Train model
-    log.info("Starting training.")
     if "test" not in config:
+
+        # Train model
+        log.info("Starting training.")
         trainer.fit(model=model, datamodule=datamodule)
 
-    # Evaluate model on test set
-    log.info("Starting test set evaluation.")
-    if config.trainer.get("fast_dev_run"):
-        trainer.test(ckpt_path=None)
-    else:
-        trainer.test()
+        # Evaluate model on test set
+        log.info("Starting test set evaluation.")
+        if config.trainer.get("fast_dev_run"):
+            trainer.test(ckpt_path=None)
+        else:
+            trainer.test()
 
-    # Print path to best checkpoint
-    log.info(f"Best checkpoint path:\n{trainer.checkpoint_callback.best_model_path}")
+        # Print path to best checkpoint
+        log.info(
+            f"Best checkpoint path:\n{trainer.checkpoint_callback.best_model_path}"
+        )
+
+    else:
+        # Test mode: model loaded from chekpoint
+        log.info(
+            f"Starting test set evaluation on checkpoint {config.model.checkpoint_path}"
+        )
+        trainer.test(model=model, datamodule=datamodule)

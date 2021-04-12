@@ -106,7 +106,6 @@ def get_backbone(name: str, pretrained: bool = True) -> Any:
     elif name == "resnext101":
         backbone = models.resnext101_32x8d(pretrained=True)
     elif name == "efficientnet7":
-
         model_names = timm.list_models(pretrained=True)
         print(model_names)
         backbone = timm.create_model(
@@ -124,6 +123,15 @@ def get_backbone(name: str, pretrained: bool = True) -> Any:
         backbone = timm.create_model(
             "seresnext50_32x4d", pretrained=True, num_classes=2
         )
+    elif name == "ssl_resnext101":
+        backbone = timm.create_model(
+            "ssl_resnext101_32x4d",
+            pretrained=True,
+            num_classes=2,
+        )
+        for name1, child in backbone.named_children():
+            print(name1)
+
     elif name == "unet_encoder":
         backbone = UnetEncoder(3)
     else:
@@ -139,7 +147,10 @@ def get_backbone(name: str, pretrained: bool = True) -> Any:
         feature_names = [None, "relu", "layer1", "layer2", "layer3"]
         backbone_output = "layer4"
     elif name.startswith("sere"):
-        feature_names = [None, "relu", "layer1", "layer2", "layer3"]
+        feature_names = [None, "act1", "layer1", "layer2", "layer3"]
+        backbone_output = "layer4"
+    elif name.startswith("ssl"):
+        feature_names = [None, "act1", "layer1", "layer2", "layer3"]
         backbone_output = "layer4"
     elif name.startswith("eff"):
         feature_names = [

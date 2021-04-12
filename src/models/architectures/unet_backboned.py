@@ -105,9 +105,24 @@ def get_backbone(name: str, pretrained: bool = True) -> Any:
         backbone = models.densenet201(pretrained=True).features
     elif name == "resnext101":
         backbone = models.resnext101_32x8d(pretrained=True)
-    elif name == "efficientnet":
+    elif name == "efficientnet7":
+
+        model_names = timm.list_models(pretrained=True)
+        print(model_names)
+        backbone = timm.create_model(
+            "tf_efficientnet_b7", pretrained=True, num_classes=2
+        )
+    elif name == "efficientnet8":
+        backbone = timm.create_model(
+            "tf_efficientnet_b8", pretrained=True, num_classes=2
+        )
+    elif name == "efficientnetl2":
         backbone = timm.create_model(
             "tf_efficientnet_l2_ns", pretrained=True, num_classes=2
+        )
+    elif name == "seresnext50":
+        backbone = timm.create_model(
+            "seresnext50_32x4d", pretrained=True, num_classes=2
         )
     elif name == "unet_encoder":
         backbone = UnetEncoder(3)
@@ -121,6 +136,9 @@ def get_backbone(name: str, pretrained: bool = True) -> Any:
         feature_names = [None, "relu", "layer1", "layer2", "layer3"]
         backbone_output = "layer4"
     elif name.startswith("resnext"):
+        feature_names = [None, "relu", "layer1", "layer2", "layer3"]
+        backbone_output = "layer4"
+    elif name.startswith("sere"):
         feature_names = [None, "relu", "layer1", "layer2", "layer3"]
         backbone_output = "layer4"
     elif name.startswith("eff"):
@@ -345,7 +363,6 @@ class UNET(nn.Module):
         features = {None: None} if None in self.shortcut_features else dict()
         for name, child in self.backbone.named_children():
             x = child(x)
-            print(name)
             if name in self.shortcut_features:
                 features[name] = x
             if name == self.bb_out_name:

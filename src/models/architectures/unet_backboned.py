@@ -1,11 +1,13 @@
 from typing import Any, List, Tuple
 
-# flake8: noqa
+import timm
 import torch
 import torch.nn as nn
 import torchvision.transforms.functional as TF
 from torch.nn import functional as F
 from torchvision import models
+
+# flake8: noqa
 
 
 class UnetDownModule(nn.Module):
@@ -103,6 +105,10 @@ def get_backbone(name: str, pretrained: bool = True) -> Any:
         backbone = models.densenet201(pretrained=True).features
     elif name == "resnext101":
         backbone = models.resnext101_32x8d(pretrained=True)
+    elif name == "efficientnet":
+        backbone = timm.create_model(
+            "tf_efficientnet_l2_ns", pretrained=True, num_classes=2
+        )
     elif name == "unet_encoder":
         backbone = UnetEncoder(3)
     else:
@@ -117,16 +123,21 @@ def get_backbone(name: str, pretrained: bool = True) -> Any:
     elif name.startswith("resnext"):
         feature_names = [None, "relu", "layer1", "layer2", "layer3"]
         backbone_output = "layer4"
+    elif name.startswith("eff"):
+        feature_names = [
+            None,
+            "conv_stem",
+            "bn1",
+            "act1",
+            "bn2",
+        ]  # "blocks","conv_head"
+        backbone_output = "act2"
     elif name == "vgg16":
-        # TODO: consider using a 'bridge' for VGG models, there is just a MaxPool between last skip and backbone output
         feature_names = ["5", "12", "22", "32", "42"]
         backbone_output = "43"
     elif name == "vgg19":
         feature_names = ["5", "12", "25", "38", "51"]
         backbone_output = "52"
-    # elif name == 'inception_v3':
-    #     feature_names = [None, 'Mixed_5d', 'Mixed_6e']
-    #     backbone_output = 'Mixed_7c'
     elif name.startswith("densenet"):
         feature_names = [None, "relu0", "denseblock1", "denseblock2", "denseblock3"]
         backbone_output = "denseblock4"
@@ -240,7 +251,7 @@ class UNET(nn.Module):
         pretrained: bool = True,
         encoder_freeze: bool = False,
         classes: int = 2,
-        decoder_filters: Tuple[int, ...] = (256, 128, 64, 32, 16),
+        decoder_filters: Tuple[int, ...] = (1024, 512, 256, 128, 64, 32, 16),
         parametric_upsampling: bool = True,
         shortcut_features: str = "default",
         decoder_use_batchnorm: bool = True,
@@ -334,6 +345,7 @@ class UNET(nn.Module):
         features = {None: None} if None in self.shortcut_features else dict()
         for name, child in self.backbone.named_children():
             x = child(x)
+            print(name)
             if name in self.shortcut_features:
                 features[name] = x
             if name == self.bb_out_name:

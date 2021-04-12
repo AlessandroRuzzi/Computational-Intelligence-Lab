@@ -81,7 +81,6 @@ class RSSimpleModel(pl.LightningModule):
 
         self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
         self.log_metrics("train", (torch.sigmoid(preds) > 0.5), targets)
-        self.summarize()
 
         return {"loss": loss}
 

@@ -31,10 +31,11 @@ class BinaryDiceLoss(nn.Module):
         predict = predict.contiguous().view(predict.shape[0], -1)
         target = target.contiguous().view(target.shape[0], -1)
 
-        num = torch.sum(torch.mul(predict, target), dim=1) + self.smooth
-        den = torch.sum(predict.pow(self.p) + target.pow(self.p), dim=1) + self.smooth
+        intersection = (predict*target).sum()
+        A_sum = torch.sum(predict)
+        B_sum = torch.sum(target)
 
-        loss = 1 - num / den
+        loss = 1 - ((2. * intersection + self.smooth) / (A_sum + B_sum + self.smooth) )
 
         if self.reduction == "mean":
             return loss.mean()

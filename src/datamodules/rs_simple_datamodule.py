@@ -31,12 +31,12 @@ class RSSimpleDataModule(pl.LightningDataModule):
         self.transforms_train = transforms
         self.transforms_test = torchvision.transforms.Compose(
             [
-                # torchvision.transforms.Resize((400, 400)),
+                torchvision.transforms.Resize((418, 418)),
                 torchvision.transforms.ToTensor(),
             ]
         )
 
-        self.dims = (3, 400, 400)
+        self.dims = (3, 418, 418)
 
         self.data_train: Any = None
         self.data_val: Any = None

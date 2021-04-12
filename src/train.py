@@ -16,8 +16,6 @@ log = logging.getLogger(__name__)
 
 def train(config: DictConfig) -> None:
 
-    print(config.model)
-
     if "seed" in config:
         pl.seed_everything(config.seed)
 

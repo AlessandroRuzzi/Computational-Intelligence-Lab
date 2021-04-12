@@ -5,7 +5,7 @@ from torchvision import transforms
 
 class Resize:
     """
-    Converts all inputs to tensors.
+    Resizes all inputs.
     """
 
     def __init__(self, size: Any) -> None:

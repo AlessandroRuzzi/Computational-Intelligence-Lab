@@ -5,7 +5,7 @@ import torch.nn as nn
 
 
 class KaggleAccuracy(nn.Module):
-    def __init__(self, patch_size: int = 16) -> None:
+    def __init__(self, patch_size: int = 11) -> None:
         super(KaggleAccuracy, self).__init__()
         self.patch_size = patch_size
         self.accuracy: Any = 0

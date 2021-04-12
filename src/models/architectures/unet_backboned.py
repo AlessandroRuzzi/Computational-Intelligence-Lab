@@ -251,7 +251,7 @@ class UNET(nn.Module):
         pretrained: bool = True,
         encoder_freeze: bool = False,
         classes: int = 2,
-        decoder_filters: Tuple[int, ...] = (1024, 512, 256, 128, 64, 32, 16),
+        decoder_filters: Tuple[int, ...] = (256, 128, 64, 32, 16),
         parametric_upsampling: bool = True,
         shortcut_features: str = "default",
         decoder_use_batchnorm: bool = True,

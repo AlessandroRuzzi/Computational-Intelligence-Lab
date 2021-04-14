@@ -110,9 +110,7 @@ def get_backbone(name: str, pretrained: bool = True) -> Any:
         backbone = resnext101_32x48d_wsl(progress=True)
 
         url = "https://dl.fbaipublicfiles.com/FixRes_data/FixRes_Pretrained_Models/ResNext101_32x48d_v2.pth"
-        print("ciao")
         r = requests.get(url, allow_redirects=True)
-        print("finish")
         open("fixres.pth", "wb").write(r.content)
 
         pretrained_dict = torch.load("fixres.pth", map_location=torch.device("cpu"))[

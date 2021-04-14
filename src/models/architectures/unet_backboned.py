@@ -1,13 +1,14 @@
 from typing import Any, List, Tuple
 
+# flake8: noqa
+import requests
 import timm
 import torch
 import torch.nn as nn
 import torchvision.transforms.functional as TF
+from imnet_extract.resnext_wsl import resnext101_32x48d_wsl
 from torch.nn import functional as F
 from torchvision import models
-
-# flake8: noqa
 
 
 class UnetDownModule(nn.Module):
@@ -105,6 +106,26 @@ def get_backbone(name: str, pretrained: bool = True) -> Any:
         backbone = models.densenet201(pretrained=True).features
     elif name == "resnext101":
         backbone = models.resnext101_32x8d(pretrained=True)
+    elif name == "fixresnext101":
+        backbone = resnext101_32x48d_wsl(progress=True)
+
+        url = "https://dl.fbaipublicfiles.com/FixRes_data/FixRes_Pretrained_Models/ResNext101_32x48d_v2.pth"
+        print("ciao")
+        r = requests.get(url, allow_redirects=True)
+        print("finish")
+        open("fixres.pth", "wb").write(r.content)
+
+        pretrained_dict = torch.load("fixres.pth", map_location=torch.device("cpu"))[
+            "model"
+        ]
+
+        model_dict = backbone.state_dict()
+        for k in model_dict.keys():
+            if ("module." + k) in pretrained_dict.keys():
+                model_dict[k] = pretrained_dict.get(("module." + k))
+        backbone.load_state_dict(model_dict)
+        for name1, child in backbone.named_children():
+            print(name1)
     elif name == "efficientnet7":
         model_names = timm.list_models(pretrained=True)
         print(model_names)
@@ -148,6 +169,9 @@ def get_backbone(name: str, pretrained: bool = True) -> Any:
         backbone_output = "layer4"
     elif name.startswith("sere"):
         feature_names = [None, "act1", "layer1", "layer2", "layer3"]
+        backbone_output = "layer4"
+    elif name.startswith("fix"):
+        feature_names = [None, "relu", "layer1", "layer2", "layer3"]
         backbone_output = "layer4"
     elif name.startswith("ssl"):
         feature_names = [None, "act1", "layer1", "layer2", "layer3"]
@@ -292,6 +316,9 @@ class UNET(nn.Module):
         self.backbone, self.shortcut_features, self.bb_out_name = get_backbone(
             backbone_name, pretrained=pretrained
         )
+
+        if self.backbone_name.startswith("fix"):
+            self.freeze_encoder()
         shortcut_chs, bb_out_chs = self.infer_skip_channels()
         if shortcut_features != "default":
             self.shortcut_features = shortcut_features

@@ -28,6 +28,8 @@ class BinaryDiceLoss(nn.Module):
         assert (
             predict.shape[0] == target.shape[0]
         ), "predict & target batch size don't match"
+
+        predict = torch.sigmoid(predict)
         predict = torch.flatten(predict)
         target = torch.flatten(target)
 

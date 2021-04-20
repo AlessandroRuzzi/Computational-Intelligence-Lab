@@ -18,7 +18,7 @@ class BinaryDiceLoss(nn.Module):
         Exception if unexpected reduction
     """
 
-    def __init__(self, smooth: float = 1.0, p: int = 2, reduction: str = "mean"):
+    def __init__(self, smooth: float = 1.0, p: int = 2, reduction: str = "none"):
         super(BinaryDiceLoss, self).__init__()
         self.smooth = smooth
         self.p = p
@@ -28,8 +28,8 @@ class BinaryDiceLoss(nn.Module):
         assert (
             predict.shape[0] == target.shape[0]
         ), "predict & target batch size don't match"
-        predict = predict.contiguous().view(predict.shape[0], -1)
-        target = target.contiguous().view(target.shape[0], -1)
+        predict = torch.flatten(predict)
+        target = torch.flatten(target)
 
         intersection = (predict*target).sum()
         A_sum = torch.sum(predict)

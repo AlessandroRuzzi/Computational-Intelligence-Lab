@@ -1,6 +1,6 @@
 
 defaults:
-  - loss: bce_with_logits.yaml
+  - loss: dice_loss.yaml
   - architecture: conv_layer.yaml
 
 _target_: src.models.rs_simple_model.RSSimpleModel

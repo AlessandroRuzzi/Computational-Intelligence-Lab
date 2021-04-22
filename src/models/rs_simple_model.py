@@ -121,4 +121,17 @@ class RSSimpleModel(pl.LightningModule):
         optimizer = torch.optim.Adam(
             list(filter(lambda p: p.requires_grad, parameters)), lr=self.lr
         )
-        return [optimizer], []
+
+        def lambda_scheduler(epoch: int) -> float:
+
+            return 0.95 ** epoch
+
+        lr_scheduler = {
+            "scheduler": torch.optim.lr_scheduler.LambdaLR(
+                optimizer, lr_lambda=[lambda_scheduler]
+            ),
+            "name": "lr_scheduler",
+            "interval": "step",
+        }
+
+        return [optimizer], [lr_scheduler]

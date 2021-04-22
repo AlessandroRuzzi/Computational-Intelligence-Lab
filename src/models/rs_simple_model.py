@@ -18,12 +18,14 @@ class RSSimpleModel(pl.LightningModule):
         architecture: torch.nn.Module,
         lr: float = 0.001,
         dir_preds_test: str = "path",
+        use_scheduler: bool = False,
     ) -> None:
         super().__init__()
 
         self.model = architecture
         self.loss = loss
         self.lr = lr
+        self.use_scheduler = use_scheduler
         self.save_hyperparameters()
         self.metrics = [("kaggle", KaggleAccuracy()), ("dice", BinaryDiceLoss())]
 
@@ -121,4 +123,19 @@ class RSSimpleModel(pl.LightningModule):
         optimizer = torch.optim.Adam(
             list(filter(lambda p: p.requires_grad, parameters)), lr=self.lr
         )
-        return [optimizer], []
+
+        def lambda_scheduler(epoch: int) -> float:
+            if self.use_scheduler:
+                return 0.95 ** epoch
+            else:
+                return 0.001
+
+        lr_scheduler = {
+            "scheduler": torch.optim.lr_scheduler.LambdaLR(
+                optimizer, lr_lambda=[lambda_scheduler]
+            ),
+            "name": "lr_scheduler",
+            "interval": "epoch",
+        }
+
+        return [optimizer], [lr_scheduler]

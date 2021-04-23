@@ -1,12 +1,10 @@
-import os
 from typing import Any, Dict, List, Sequence, Tuple, Union
 
 import pytorch_lightning as pl
 import torch
-import torchvision
 from torch.optim import Optimizer
-from torchvision.utils import save_image
 
+import src.utils.model_utils as utils
 from src.models.metrics.dice_loss import BinaryDiceLoss
 from src.models.metrics.kaggle_accuracy import KaggleAccuracy
 
@@ -50,39 +48,14 @@ class RSSimpleModel(pl.LightningModule):
                 prog_bar=False,
             )
 
-    def log_images(
-        self, title: str, x: torch.Tensor, y: torch.Tensor, preds: torch.Tensor
-    ) -> None:
-        batch_x = x
-        batch_y = y.expand(-1, 3, -1, -1)
-        # batch_preds = preds.expand(-1, 3, -1, -1)
-        batch_preds_sigmoid = torch.sigmoid(preds).expand(-1, 3, -1, -1)
-        batch_preds_sigmoid_treshold = (torch.sigmoid(preds) > 0.5).expand(
-            -1, 3, -1, -1
-        )
-
-        block = torch.cat(
-            (
-                batch_x,
-                batch_y,
-                batch_preds_sigmoid,
-                batch_preds_sigmoid_treshold,
-            ),
-            0,
-        )
-
-        img_grid = torchvision.utils.make_grid(block)
-        img_grid = img_grid.permute((1, 2, 0))
-
-        self.logger[0].experiment.log_image(img_grid.cpu(), title)
-
     def training_step(
         self, batch: List[torch.Tensor], batch_idx: int
     ) -> Dict[str, torch.Tensor]:
         loss, preds, targets = self.step(batch)
+        preds_proba = torch.sigmoid(preds)
 
         self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
-        self.log_metrics("train", (torch.sigmoid(preds) > 0.5), targets)
+        self.log_metrics("train", (preds_proba > 0.5), targets)
 
         return {"loss": loss}
 
@@ -91,28 +64,30 @@ class RSSimpleModel(pl.LightningModule):
     ) -> Dict[str, torch.Tensor]:
         x, y = batch
         loss, preds, targets = self.step(batch)
-        # acc = self.val_accuracy(preds, targets)
+        preds_proba = torch.sigmoid(preds)
+
         self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
-        self.log_metrics("val", (torch.sigmoid(preds) > 0.5), targets)
-        self.log_images("Validation Batch", x, y, preds)
+        self.log_metrics("val", (preds_proba > 0.5), targets)
+        image_grid = utils.build_image_grid_train(x, y, preds_proba).cpu()
+        self.logger[0].experiment.log_image(image_grid, "Validation Batch")
 
         return {"loss": loss}
 
     def test_step(self, batch: torch.Tensor, batch_id: int) -> Dict[str, torch.Tensor]:
         x, kaggle_ids = batch
-        preds = (torch.sigmoid(self.forward(x)) > 0.5).float()
+        preds_proba = torch.sigmoid(self.forward(x))
+        preds_discr = (preds_proba > 0.5).float()
+
+        # Log prediction images
+        image_grid = utils.build_image_grid_test(x, preds_proba).cpu()
+        self.logger[0].experiment.log_image(image_grid, "Test Batch")
 
         # Save predictions images to folder
-        os.makedirs(self.hparams["dir_preds_test"], exist_ok=True)
+        utils.save_images(
+            path=self.hparams["dir_preds_test"], ids=kaggle_ids, preds=preds_discr
+        )
 
-        for i in range(x.shape[0]):
-            save_image(
-                preds[i],
-                os.path.join(
-                    self.hparams["dir_preds_test"],
-                    f"satImage_{kaggle_ids[i]:03.0f}.png",
-                ),
-            )
+        # TODO: Call submit function to generate submission.csv and upload file to comet
 
         return {}
 

@@ -10,8 +10,6 @@ from typing import Any, List, Sequence
 import matplotlib.pyplot as plt
 import numpy as np
 import pytorch_lightning as pl
-import torch
-import torchvision
 from omegaconf import DictConfig, OmegaConf
 from rich import print
 from rich.syntax import Syntax
@@ -188,10 +186,3 @@ def imshow(
     ax.set_xticklabels(list(""))
     ax.set_yticklabels(list(""))
     plt.show()
-
-
-def log_image(experiment: Any, image: torch.Tensor, title: str) -> None:
-    image = torchvision.utils.make_grid(image)
-    image = image.permute((1, 2, 0))
-    # print(image.size())
-    experiment.log_image(image.cpu(), title)

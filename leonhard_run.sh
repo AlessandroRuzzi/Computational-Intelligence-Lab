@@ -6,5 +6,4 @@
 #bsub -W 20:00 -R "rusage[mem=64000, ngpus_excl_p=1]" python3 ./run.py +experiment=exp_standard
 bsub -W 24:00 -R "rusage[mem=64000, ngpus_excl_p=1]" -R "select[gpu_model0==GeForceRTX2080Ti]" python3 ./run.py +experiment=exp_simple_unet_backboned_fine_tuning
 # Run test from checkpoint 
-bsub -W 01:00 -R "rusage[mem=64000, ngpus_excl_p=1]" -R "select[gpu_model0==GeForceRTX2080Ti]" python3 ./run.py +experiment=test_simple_unet_backboned +model.checkpoint_path=${ckpts_dir}/2021-04-10/16-22-39/last.ckpt
-
+bsub -W 01:00 -R "rusage[mem=64000, ngpus_excl_p=1]" -R "select[gpu_model0==GeForceRTX2080Ti]" python3 ./run.py +experiment=test_simple_unet_backboned +model.checkpoint_path=/cluster/home/scflavio/Computational-Intelligence-Lab-2021/logs/ckpts/2021-04-11/18-59-48/last.ckpt

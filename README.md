@@ -32,3 +32,9 @@ python -m venv venv
 ```console
 bsub -R "rusage[ngpus_excl_p=1]" ./run.py trainer.gpus=1
 ``` 
+
+## Download from cluster 
+The following command will download a zipped prediction into your current local folder. 
+```console 
+scp your_username@login.leonhard.ethz.ch:/Computational-Intelligence-Lab-2021/preds/DATE/preds.zip .
+```

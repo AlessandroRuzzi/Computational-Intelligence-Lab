@@ -75,7 +75,9 @@ def mask_to_submission_strings(
         for i in range(0, im.shape[0], patch_size):
             patch = im[i : i + patch_size, j : j + patch_size]
             label = int(np.mean(patch) > threshold)
-            yield (f"{img_number:03d}_{j}_{i},{label}")
+            yield (
+                f"{img_number:03d}_{int(j/patch_size)*16}_{int(i/patch_size)*16},{label}"
+            )
 
 
 def images_to_csv(path: str, csv_filename: str, patch_size: int = 16) -> str:

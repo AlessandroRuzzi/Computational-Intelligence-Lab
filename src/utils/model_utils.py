@@ -89,6 +89,10 @@ def images_to_csv(path: str, csv_filename: str, patch_size: int = 16) -> str:
         if os.path.isfile(os.path.join(path, filename))
     ]
 
+    image_filenames = sorted(
+        image_filenames, key=lambda k: int(re.search(r"\d+", k).group(0))
+    )
+
     # Converts images into a submission file
     with open(output_file, "w") as f:
         f.write("id,prediction\n")

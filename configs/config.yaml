@@ -17,7 +17,7 @@ debug: False # This uses pytorch-lighning fast_dev_run
 print_config: True # Pretty prints configs at the start of run 
 disable_warnings: False 
 test: False # Set to true to run the model only on the test set, must include +model.checkpoint_path=path 
-test_on_best: True # Use best checkpoint during test, if False will use the last 
+test_on_best: False # Use best checkpoint during test must have ModelCheckpoint active, if False will use the last 
 
 
 hydra:

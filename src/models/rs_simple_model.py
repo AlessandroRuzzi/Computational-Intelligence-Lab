@@ -87,9 +87,18 @@ class RSSimpleModel(pl.LightningModule):
             path=self.hparams["dir_preds_test"], ids=kaggle_ids, preds=preds_discr
         )
 
-        # TODO: Call submit function to generate submission.csv and upload file to comet
-
         return {}
+
+    def on_test_end(self) -> None:
+        # Generate csv from file
+        submission_filename = "submission.csv"
+        submission_file = utils.images_to_csv(
+            path=self.hparams["dir_preds_test"],
+            csv_filename=submission_filename,
+            patch_size=11,
+        )
+        # Log subission file
+        self.logger[0].experiment.log_asset(submission_file)
 
     def configure_optimizers(
         self,

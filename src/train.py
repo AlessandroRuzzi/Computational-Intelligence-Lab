@@ -60,7 +60,7 @@ def train(config: DictConfig) -> None:
         logger=loggers,
     )
 
-    if "test" not in config:
+    if not config.test:
 
         # Train model
         log.info("Starting training.")
@@ -69,7 +69,7 @@ def train(config: DictConfig) -> None:
         # Evaluate model on test set
         log.info("Starting test set evaluation.")
         if config.trainer.get("fast_dev_run"):
-            trainer.test(ckpt_path=None)
+            trainer.test(ckpt_path="best" if trainer.test_on_best else None)
         else:
             trainer.test()
 

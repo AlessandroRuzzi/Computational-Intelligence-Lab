@@ -1,4 +1,4 @@
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 import pytorch_lightning as pl
 import torchvision
@@ -70,7 +70,10 @@ class RSSimpleDataModule(pl.LightningDataModule):
             shuffle=True,
         )
 
-    def val_dataloader(self) -> DataLoader:
+    def val_dataloader(self) -> Optional[DataLoader]:
+        if self.train_val_split[1] == 0:
+            return None
+
         return DataLoader(
             dataset=self.data_val,
             batch_size=self.batch_size,

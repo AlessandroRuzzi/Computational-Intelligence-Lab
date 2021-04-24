@@ -23,3 +23,11 @@ model:
 datamodule:
   train_val_split: [100, 0]
 
+callbacks:
+  model_checkpoint:
+    monitor: "train_kaggle"   # name of the logged metric which determines when model is improving
+    filename: '{epoch:02d}-{train_kaggle:.2f}'
+
+  early_stopping:
+    monitor: "train_kaggle"   # name of the logged metric which determines when model is improving
+

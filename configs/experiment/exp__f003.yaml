@@ -1,0 +1,21 @@
+# @package _global_
+
+defaults:
+  - override /model/architecture: unet_backboned.yaml
+  - override /model/loss: bce_with_logits_loss.yaml 
+  # Color logging 
+  - override /hydra/hydra_logging: colorlog
+  - override /hydra/job_logging: colorlog 
+
+seed: 12345
+test_on_best: True 
+
+trainer: 
+  gpus: 1
+  max_epochs: 80
+
+model:
+  architecture:
+    backbone_name: seresnext50
+ 
+

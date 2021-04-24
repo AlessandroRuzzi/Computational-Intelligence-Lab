@@ -5,8 +5,9 @@ import torch
 from torch.optim import Optimizer
 
 import src.utils.model_utils as utils
-from src.models.metrics.dice_loss import BinaryDiceLoss
 from src.models.metrics.kaggle_accuracy import KaggleAccuracy
+
+# from src.models.metrics.dice_loss import BinaryDiceLoss
 
 
 class RSSimpleModel(pl.LightningModule):
@@ -25,7 +26,7 @@ class RSSimpleModel(pl.LightningModule):
         self.lr = lr
         self.use_scheduler = use_scheduler
         self.save_hyperparameters()
-        self.metrics = [("kaggle", KaggleAccuracy()), ("dice", BinaryDiceLoss())]
+        self.metrics = [("kaggle", KaggleAccuracy())]
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)

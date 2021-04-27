@@ -1,9 +1,11 @@
 from typing import Any, Callable
 
 import pytorch_lightning as pl
+import torch
 import torchvision
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import ConcatDataset, DataLoader, random_split
 
+from src.datamodules.datasets.google_maps_dataset import GoogleMapsDataset
 from src.datamodules.datasets.rs_kaggle_dataset import RSKaggleDataset
 from src.datamodules.transforms.to_tensor import ToTensor
 
@@ -50,14 +52,25 @@ class RSSimpleDataModule(pl.LightningDataModule):
         RSKaggleDataset(self.data_dir, train=True, download=True)
         RSKaggleDataset(self.data_dir, train=False, download=True)
 
+        GoogleMapsDataset(self.data_dir, download=True)
+
     def setup(self, stage: Any = None) -> None:
         # Transform and split datasets
-        trainset = RSKaggleDataset(
+        kaggle_trainset = RSKaggleDataset(
             self.data_dir, train=True, transforms=self.transforms_train
         )
+        google_maps_trainset = GoogleMapsDataset(
+            self.data_dir, transforms=self.transforms_train
+        )
+
+        train_datasets: list = [kaggle_trainset, google_maps_trainset]
+
+        trainset: torch.utils.data.ConcatDataset = ConcatDataset(train_datasets)
+
         testset = RSKaggleDataset(
             self.data_dir, train=False, transforms=self.transforms_test
         )
+
         self.data_train, self.data_val = random_split(trainset, self.train_val_split)
         self.data_test = testset
 

@@ -66,11 +66,12 @@ def save_images(path: str, ids: torch.Tensor, preds: torch.Tensor) -> None:
 
 
 def mask_to_submission_strings(
-    path: str, image_filename: str, patch_size: int, threshold: float = 0.25
+    path: str, image_filename: str, threshold: float = 0.25
 ) -> Generator:
 
     img_number = int(re.search(r"\d+", image_filename).group(0))
     im = mpimg.imread(os.path.join(path, image_filename))
+    patch_size = im.shape[0] // 38
     for j in range(0, im.shape[1], patch_size):
         for i in range(0, im.shape[0], patch_size):
             patch = im[i : i + patch_size, j : j + patch_size]
@@ -80,7 +81,7 @@ def mask_to_submission_strings(
             )
 
 
-def images_to_csv(path: str, csv_filename: str, patch_size: int = 16) -> str:
+def images_to_csv(path: str, csv_filename: str) -> str:
 
     output_file = os.path.join(path, csv_filename)
 
@@ -99,8 +100,6 @@ def images_to_csv(path: str, csv_filename: str, patch_size: int = 16) -> str:
     with open(output_file, "w") as f:
         f.write("id,prediction\n")
         for filename in image_filenames:
-            f.writelines(
-                f"{s}\n" for s in mask_to_submission_strings(path, filename, patch_size)
-            )
+            f.writelines(f"{s}\n" for s in mask_to_submission_strings(path, filename))
 
     return output_file

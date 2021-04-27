@@ -26,7 +26,7 @@ def mask_to_submission_strings(image_filename: str) -> Generator:
     """Reads a single image and outputs the strings that should go into the submission file"""
     img_number = int(re.search(r"\d+", image_filename).group(0))
     im = mpimg.imread(image_filename)
-    patch_size = 16
+    patch_size = im.shape[0] / 38
     for j in range(0, im.shape[1], patch_size):
         for i in range(0, im.shape[0], patch_size):
             patch = im[i : i + patch_size, j : j + patch_size]

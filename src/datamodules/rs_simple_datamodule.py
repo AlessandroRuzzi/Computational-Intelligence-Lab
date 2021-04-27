@@ -13,7 +13,8 @@ class RSSimpleDataModule(pl.LightningDataModule):
         self,
         data_dir: str = "data/",
         batch_size: int = 64,
-        transforms: Callable = ToTensor(),
+        transforms_train: Callable = ToTensor(),
+        transforms_test: Callable = torchvision.transforms.ToTensor(),
         train_val_split: tuple = (80, 20),
         num_workers: int = 0,
         pin_memory: bool = False,
@@ -28,15 +29,8 @@ class RSSimpleDataModule(pl.LightningDataModule):
         self.num_workers = num_workers
         self.pin_memory = pin_memory
 
-        self.transforms_train = transforms
-        self.transforms_test = torchvision.transforms.Compose(
-            [
-                torchvision.transforms.Resize((418, 418)),
-                torchvision.transforms.ToTensor(),
-            ]
-        )
-
-        self.dims = (3, 418, 418)
+        self.transforms_train = transforms_train
+        self.transforms_test = transforms_test
 
         self.data_train: Any = None
         self.data_val: Any = None

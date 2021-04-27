@@ -3,8 +3,8 @@
 defaults:
   - override /model/architecture: unet_backboned.yaml
   - override /model/loss: mixed_loss.yaml 
-  - override /model/datamodule/transforms_train: transforms_0_400x400.yaml
-  - override /model/datamodule/transforms_test: transforms_1_608x608.yaml
+  - override /datamodule/transforms_train: transforms_0_400x400.yaml
+  - override /datamodule/transforms_test: transforms_1_608x608.yaml
   # Color logging 
   - override /hydra/hydra_logging: colorlog
   - override /hydra/job_logging: colorlog 

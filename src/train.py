@@ -70,10 +70,12 @@ def train(config: DictConfig) -> None:
         log.info("Starting test set evaluation.")
         trainer.test(ckpt_path="best" if config.test_on_best else None)
 
-        # Print path to best checkpoint
-        log.info(
-            f"Best checkpoint path:\n{trainer.checkpoint_callback.best_model_path}"
-        )
+        if config.test_on_best:
+            log.info(
+                f"Tested on best checkpoint path:\n{trainer.checkpoint_callback.best_model_path}"
+            )
+        else:
+            log.info("Tested on last epoch.")
 
     else:
         # Test mode: model loaded from chekpoint

@@ -1,9 +1,8 @@
 from typing import Any, Callable
 
 import pytorch_lightning as pl
-import torch
 import torchvision
-from torch.utils.data import ConcatDataset, DataLoader, random_split
+from torch.utils.data import DataLoader, random_split
 
 from src.datamodules.datasets.google_maps_dataset import GoogleMapsDataset
 from src.datamodules.datasets.rs_kaggle_dataset import RSKaggleDataset
@@ -40,6 +39,7 @@ class RSSimpleDataModule(pl.LightningDataModule):
 
         self.dims = (3, 418, 418)
 
+        self.data_pretrain: Any = None
         self.data_train: Any = None
         self.data_val: Any = None
         self.data_test: Any = None
@@ -63,25 +63,41 @@ class RSSimpleDataModule(pl.LightningDataModule):
             self.data_dir, transforms=self.transforms_train
         )
 
-        train_datasets: list = [kaggle_trainset, google_maps_trainset]
+        # train_datasets: list = [kaggle_trainset, google_maps_trainset]
 
-        trainset: torch.utils.data.ConcatDataset = ConcatDataset(train_datasets)
+        # trainset: torch.utils.data.ConcatDataset = ConcatDataset(train_datasets)
 
         testset = RSKaggleDataset(
             self.data_dir, train=False, transforms=self.transforms_test
         )
 
-        self.data_train, self.data_val = random_split(trainset, self.train_val_split)
+        self.data_pretrain = google_maps_trainset
+
+        self.data_train, self.data_val = random_split(
+            kaggle_trainset, self.train_val_split
+        )
         self.data_test = testset
 
     def train_dataloader(self) -> DataLoader:
-        return DataLoader(
-            dataset=self.data_train,
-            batch_size=self.batch_size,
-            num_workers=self.num_workers,
-            pin_memory=self.pin_memory,
-            shuffle=True,
-        )
+        print(self.trainer.current_epoch)
+        if self.trainer.current_epoch <= 1:
+            print(self.data_pretrain.images[0])
+            return DataLoader(
+                dataset=self.data_pretrain,
+                batch_size=self.batch_size,
+                num_workers=self.num_workers,
+                pin_memory=self.pin_memory,
+                shuffle=True,
+            )
+        else:
+            print(self.data_pretrain.images[0])
+            return DataLoader(
+                dataset=self.data_train,
+                batch_size=self.batch_size,
+                num_workers=self.num_workers,
+                pin_memory=self.pin_memory,
+                shuffle=True,
+            )
 
     def val_dataloader(self) -> DataLoader:
         return DataLoader(

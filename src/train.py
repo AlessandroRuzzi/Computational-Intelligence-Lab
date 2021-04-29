@@ -9,7 +9,7 @@ import pytorch_lightning as pl
 from hydra.utils import call, instantiate
 from omegaconf import DictConfig
 
-from src.utils import template_utils
+import src.utils as utils
 
 log = logging.getLogger(__name__)
 
@@ -51,7 +51,7 @@ def train(config: DictConfig) -> None:
     # Send config params to loggers
     log.info("Logging hyperparameters.")
 
-    template_utils.log_hyperparameters(
+    utils.template_utils.log_hyperparameters(
         config=config,
         model=model,
         datamodule=datamodule,
@@ -60,7 +60,7 @@ def train(config: DictConfig) -> None:
         logger=loggers,
     )
 
-    if "test" not in config:
+    if not config.test:
 
         # Train model
         log.info("Starting training.")
@@ -69,7 +69,7 @@ def train(config: DictConfig) -> None:
         # Evaluate model on test set
         log.info("Starting test set evaluation.")
         if config.trainer.get("fast_dev_run"):
-            trainer.test(ckpt_path=None)
+            trainer.test(ckpt_path="best" if config.test_on_best else None)
         else:
             trainer.test()
 

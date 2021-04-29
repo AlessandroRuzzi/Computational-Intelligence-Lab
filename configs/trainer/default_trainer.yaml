@@ -1,20 +1,12 @@
 # For more settings see https://pytorch-lightning.readthedocs.io/en/latest/common/trainer.html
 
 _target_: pytorch_lightning.Trainer
-# Set `1` to train on GPU, `0` to train on CPU only, and `-1` to train on all GPUs, default `0` 
-gpus: 0 
-# Logs memory of GPUs, default `None` 
-log_gpu_memory: all 
-# Precision used for tensors, default `32`
-precision: 32
-# `ddp` GPUs train individually and sync gradients, default `None` 
-accelerator: null   
-
+gpus: 0 # Set `1` to train on GPU, `0` to train on CPU only, and `-1` to train on all GPUs, default `0` 
+log_gpu_memory: all # Logs memory of GPUs, default `None` 
+precision: 32 # Precision used for tensors, default `32`
+accelerator: null # `ddp` GPUs train individually and sync gradients, default `None` 
 min_epochs: 1
 max_epochs: 100_000
-
-# Prints a summary of the model weights, default `top` 
-weights_summary: top
+weights_summary: top # Prints a summary of the model weights, default `top` 
 progress_bar_refresh_rate: 1 # Every batch 
-
 terminate_on_nan: False 

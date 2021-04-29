@@ -2,6 +2,7 @@
 
 defaults:
   - override /model/architecture: unet_backboned.yaml
+  - override /model/loss: bce_with_logits_loss.yaml 
   # Color logging 
   - override /hydra/hydra_logging: colorlog
   - override /hydra/job_logging: colorlog 
@@ -11,9 +12,10 @@ test_on_best: True
 
 trainer: 
   gpus: 1
+  max_epochs: 80
 
-callbacks:
-  step_fine_tuning:
-    _target_: src.models.callbacks.step_fine_tuning.StepFineTuning 
-    layers: [5, 30, 60, 100, 150, 250]
-    milestones: [10, 20, 30, 40, 50, 60, 70]
+model:
+  architecture:
+    backbone_name: seresnext50
+ 
+

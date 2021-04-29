@@ -14,7 +14,7 @@ class KaggleAccuracy(nn.Module):
         y_true = []
         y_preds = []
         for i in range(len(y)):
-            patch_size = y[i].shape[0] // 38
+            patch_size = y[i].shape[1] // 38
             y_true.append(
                 y[i].reshape(
                     (

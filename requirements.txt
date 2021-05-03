@@ -18,4 +18,5 @@ rich==10.0.1
 scikit_learn==0.23.1
 timm==0.4.5
 torch==1.8.1
+torchtext== 0.9.1
 torchvision==0.9.1

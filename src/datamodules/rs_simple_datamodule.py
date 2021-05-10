@@ -57,10 +57,6 @@ class RSSimpleDataModule(pl.LightningDataModule):
             self.data_dir, transforms=self.transforms_train
         )
 
-        # train_datasets: list = [kaggle_trainset, google_maps_trainset]
-
-        # trainset: torch.utils.data.ConcatDataset = ConcatDataset(train_datasets)
-
         testset = RSKaggleDataset(
             self.data_dir, train=False, transforms=self.transforms_test
         )

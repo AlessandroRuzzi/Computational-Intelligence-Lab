@@ -46,7 +46,7 @@ class GoogleMapsDataset(torch.utils.data.Dataset):
         self.process()
 
     def randomize_image(self) -> Any:
-        noise_coords = torch.rand(100, 2)
+        noise_coords = torch.rand(200, 2)
 
         # Some coordinates with good looking roads near Chicago
         init_lat, init_long = 41.776796856026245, -88.29816520687764
@@ -58,8 +58,8 @@ class GoogleMapsDataset(torch.utils.data.Dataset):
     def construct_image_mask(self, latitude: str, longitude: str) -> Tuple[Any, Any]:
         base_url = "https://maps.googleapis.com/maps/api/staticmap?"
 
-        zoom_sat = "&zoom=16"
-        zoom_road = "&zoom=16"
+        zoom_sat = "&zoom=17"
+        zoom_road = "&zoom=18"
         size = "&size=512x512"
         key = "&key="
         remove_markers = "&style=feature:all|element:labels|visibility:off"

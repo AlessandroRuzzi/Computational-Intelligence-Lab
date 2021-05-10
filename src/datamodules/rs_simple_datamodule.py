@@ -73,7 +73,8 @@ class RSSimpleDataModule(pl.LightningDataModule):
         self.data_test = testset
 
     def train_dataloader(self) -> DataLoader:
-        if self.trainer.current_epoch <= 50:
+        if self.trainer.current_epoch <= 10:
+            print("trains on google dataset")
             return DataLoader(
                 dataset=self.data_pretrain,
                 batch_size=self.batch_size,
@@ -82,6 +83,8 @@ class RSSimpleDataModule(pl.LightningDataModule):
                 shuffle=True,
             )
         else:
+            if self.train.current_epoch <= 20:
+                print("trains on kaggle dataset")
             return DataLoader(
                 dataset=self.data_train,
                 batch_size=self.batch_size,

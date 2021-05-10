@@ -10,3 +10,4 @@ max_epochs: 100_000
 weights_summary: top # Prints a summary of the model weights, default `top` 
 progress_bar_refresh_rate: 1 # Every batch 
 terminate_on_nan: False 
+reload_dataloaders_every_epoch: True

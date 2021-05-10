@@ -28,25 +28,23 @@ class GoogleMapsDataset(torch.utils.data.Dataset):
         root: str = "data/",
         download: bool = True,
         transforms: Optional[Callable] = None,
+        google_maps_api: str = "",
     ) -> None:
         self.root = root
         self.transforms = transforms
+        self.google_maps_api = google_maps_api
         self.images: List[str] = []
         self.masks: List[str] = []
         self.indeces: torch.Tensor = torch.tensor([])
-
-        if download:
-            self.download()
+        
 
         if not self._check_exists():
-            raise RuntimeError(
-                "Dataset not found." + " You can use download=True to download it"
-            )
+            self.download()
 
         self.process()
 
     def randomize_image(self) -> Any:
-        noise_coords = torch.rand(250, 2)
+        noise_coords = torch.rand(10, 2)
 
         # Some coordinates with good looking roads near Chicago
         init_lat, init_long = 41.776796856026245, -88.29816520687764
@@ -64,7 +62,7 @@ class GoogleMapsDataset(torch.utils.data.Dataset):
         key = "&key="
         remove_markers = "&style=feature:all|element:labels|visibility:off"
 
-        YOUR_API_KEY = "AIzaSyBq70tQbUbTNVdKe3Ahz64USXDgOP03MyQ"
+        GOOGLE_MAPS_API = self.google_maps_api
         sat_type = "&maptype=satellite"
         roadmap_type = "&maptype=roadmap"
 
@@ -80,7 +78,7 @@ class GoogleMapsDataset(torch.utils.data.Dataset):
             + size
             + remove_markers
             + key
-            + YOUR_API_KEY
+            + GOOGLE_MAPS_API
         )
         roadmap_url = (
             base_url
@@ -93,7 +91,7 @@ class GoogleMapsDataset(torch.utils.data.Dataset):
             + size
             + remove_markers
             + key
-            + YOUR_API_KEY
+            + GOOGLE_MAPS_API
         )
 
         # Fetch maps images from these URLs

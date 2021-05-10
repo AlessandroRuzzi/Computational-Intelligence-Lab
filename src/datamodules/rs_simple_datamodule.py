@@ -13,6 +13,7 @@ class RSSimpleDataModule(pl.LightningDataModule):
     def __init__(
         self,
         data_dir: str = "data/",
+        google_maps_api: str = "",
         batch_size: int = 64,
         transforms_train: Callable = ToTensor(),
         transforms_test: Callable = torchvision.transforms.ToTensor(),
@@ -25,6 +26,7 @@ class RSSimpleDataModule(pl.LightningDataModule):
         super().__init__()
 
         self.data_dir = data_dir
+        self.google_maps_api = google_maps_api
         self.batch_size = batch_size
         self.train_val_split = train_val_split
         self.num_workers = num_workers
@@ -46,7 +48,7 @@ class RSSimpleDataModule(pl.LightningDataModule):
         RSKaggleDataset(self.data_dir, train=True, download=True)
         RSKaggleDataset(self.data_dir, train=False, download=True)
 
-        GoogleMapsDataset(self.data_dir, download=False)
+        GoogleMapsDataset(self.data_dir, download=True)
 
     def setup(self, stage: Any = None) -> None:
         # Transform and split datasets
@@ -54,7 +56,7 @@ class RSSimpleDataModule(pl.LightningDataModule):
             self.data_dir, train=True, transforms=self.transforms_train
         )
         google_maps_trainset = GoogleMapsDataset(
-            self.data_dir, transforms=self.transforms_train
+            self.data_dir, transforms=self.transforms_train, google_maps_api=self.google_maps_api
         )
 
         testset = RSKaggleDataset(
@@ -70,7 +72,7 @@ class RSSimpleDataModule(pl.LightningDataModule):
 
     def train_dataloader(self) -> DataLoader:
         if self.trainer.current_epoch <= 60:
-            if self.trainer.current_epoch <= 3:
+            if self.trainer.current_epoch <= 1:
                 print("Start training on google dataset")
             return DataLoader(
                 dataset=self.data_pretrain,
@@ -80,7 +82,7 @@ class RSSimpleDataModule(pl.LightningDataModule):
                 shuffle=True,
             )
         else:
-            if self.trainer.current_epoch <= 64:
+            if self.trainer.current_epoch <= 61:
                 print("Start training on kaggle dataset")
             return DataLoader(
                 dataset=self.data_train,

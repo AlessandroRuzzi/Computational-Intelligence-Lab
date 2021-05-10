@@ -26,7 +26,7 @@ class GoogleMapsDataset(torch.utils.data.Dataset):
     def __init__(
         self,
         root: str = "data/",
-        download: bool = False,
+        download: bool = True,
         transforms: Optional[Callable] = None,
     ) -> None:
         self.root = root
@@ -46,7 +46,7 @@ class GoogleMapsDataset(torch.utils.data.Dataset):
         self.process()
 
     def randomize_image(self) -> Any:
-        noise_coords = torch.rand(100, 2)
+        noise_coords = torch.rand(250, 2)
 
         # Some coordinates with good looking roads near Chicago
         init_lat, init_long = 41.776796856026245, -88.29816520687764
@@ -58,13 +58,13 @@ class GoogleMapsDataset(torch.utils.data.Dataset):
     def construct_image_mask(self, latitude: str, longitude: str) -> Tuple[Any, Any]:
         base_url = "https://maps.googleapis.com/maps/api/staticmap?"
 
-        zoom_sat = "&zoom=16"
-        zoom_road = "&zoom=16"
+        zoom_sat = "&zoom=17"
+        zoom_road = "&zoom=17"
         size = "&size=512x512"
         key = "&key="
         remove_markers = "&style=feature:all|element:labels|visibility:off"
 
-        YOUR_API_KEY = "AIzaSyA2h9DsyONlCFOo4w5p9RF3J96rV8mCVyQ"
+        YOUR_API_KEY = "AIzaSyBq70tQbUbTNVdKe3Ahz64USXDgOP03MyQ"
         sat_type = "&maptype=satellite"
         roadmap_type = "&maptype=roadmap"
 
@@ -112,8 +112,8 @@ class GoogleMapsDataset(torch.utils.data.Dataset):
     def download(self) -> None:
 
         # remove the not once the dataset is constructed
-        if not self._check_exists():
-            return
+        # if not self._check_exists():
+        #     return
 
         os.makedirs(self.folder_processed, exist_ok=True)
 

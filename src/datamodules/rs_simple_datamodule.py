@@ -46,7 +46,7 @@ class RSSimpleDataModule(pl.LightningDataModule):
         RSKaggleDataset(self.data_dir, train=True, download=True)
         RSKaggleDataset(self.data_dir, train=False, download=True)
 
-        GoogleMapsDataset(self.data_dir, download=True)
+        GoogleMapsDataset(self.data_dir, download=False)
 
     def setup(self, stage: Any = None) -> None:
         # Transform and split datasets
@@ -73,7 +73,9 @@ class RSSimpleDataModule(pl.LightningDataModule):
         self.data_test = testset
 
     def train_dataloader(self) -> DataLoader:
-        if self.trainer.current_epoch <= 50:
+        if self.trainer.current_epoch <= 60:
+            if self.trainer.current_epoch <= 3:
+                print("Start training on google dataset")
             return DataLoader(
                 dataset=self.data_pretrain,
                 batch_size=self.batch_size,
@@ -82,6 +84,8 @@ class RSSimpleDataModule(pl.LightningDataModule):
                 shuffle=True,
             )
         else:
+            if self.trainer.current_epoch <= 64:
+                print("Start training on kaggle dataset")
             return DataLoader(
                 dataset=self.data_train,
                 batch_size=self.batch_size,

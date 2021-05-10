@@ -48,22 +48,25 @@ class RSSimpleDataModule(pl.LightningDataModule):
         RSKaggleDataset(self.data_dir, train=True, download=True)
         RSKaggleDataset(self.data_dir, train=False, download=True)
 
-        GoogleMapsDataset(self.data_dir, download=True)
+        if self.google_maps_api != "":
+            GoogleMapsDataset(self.data_dir, download=True)
 
     def setup(self, stage: Any = None) -> None:
         # Transform and split datasets
         kaggle_trainset = RSKaggleDataset(
             self.data_dir, train=True, transforms=self.transforms_train
         )
-        google_maps_trainset = GoogleMapsDataset(
-            self.data_dir, transforms=self.transforms_train, google_maps_api=self.google_maps_api
-        )
+        if self.google_maps_api != "":
+            google_maps_trainset = GoogleMapsDataset(
+                self.data_dir, transforms=self.transforms_train, google_maps_api=self.google_maps_api
+            )
+            self.data_pretrain = google_maps_trainset
 
         testset = RSKaggleDataset(
             self.data_dir, train=False, transforms=self.transforms_test
         )
 
-        self.data_pretrain = google_maps_trainset
+        
 
         self.data_train, self.data_val = random_split(
             kaggle_trainset, self.train_val_split
@@ -71,19 +74,30 @@ class RSSimpleDataModule(pl.LightningDataModule):
         self.data_test = testset
 
     def train_dataloader(self) -> DataLoader:
-        if self.trainer.current_epoch <= 60:
-            if self.trainer.current_epoch <= 1:
-                print("Start training on google dataset")
-            return DataLoader(
-                dataset=self.data_pretrain,
-                batch_size=self.batch_size,
-                num_workers=self.num_workers,
-                pin_memory=self.pin_memory,
-                shuffle=True,
-            )
+        #Pretrain on google maps dataset and then train on kaggle dataset
+        if self.google_maps_api != "":
+            if self.trainer.current_epoch <= 60:
+                if self.trainer.current_epoch <= 1:
+                    print("Start training on google dataset")
+                return DataLoader(
+                    dataset=self.data_pretrain,
+                    batch_size=self.batch_size,
+                    num_workers=self.num_workers,
+                    pin_memory=self.pin_memory,
+                    shuffle=True,
+                )
+            else:
+                if self.trainer.current_epoch <= 61:
+                    print("Start training on kaggle dataset")
+                return DataLoader(
+                    dataset=self.data_train,
+                    batch_size=self.batch_size,
+                    num_workers=self.num_workers,
+                    pin_memory=self.pin_memory,
+                    shuffle=True,
+                )
+        #Train only on kaggle dataset if no google maps API key was given
         else:
-            if self.trainer.current_epoch <= 61:
-                print("Start training on kaggle dataset")
             return DataLoader(
                 dataset=self.data_train,
                 batch_size=self.batch_size,

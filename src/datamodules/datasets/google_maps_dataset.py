@@ -36,7 +36,6 @@ class GoogleMapsDataset(torch.utils.data.Dataset):
         self.images: List[str] = []
         self.masks: List[str] = []
         self.indeces: torch.Tensor = torch.tensor([])
-        
 
         if not self._check_exists():
             self.download()

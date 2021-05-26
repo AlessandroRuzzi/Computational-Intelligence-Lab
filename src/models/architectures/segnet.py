@@ -12,11 +12,14 @@ class SegNet(nn.Module):
         drop_rate (float): dropout rate of each encoder/decoder module
         filter_config (list of 5 ints): number of output features at each level
     """
-    def __init__(self, 
-                num_classes : int = 2, 
-                n_init_features : int =  1, 
-                drop_rate : int = 0.5,
-                filter_config : List[int] = (64, 128, 256, 512, 512)) -> None:
+
+    def __init__(
+        self,
+        num_classes: int = 2,
+        n_init_features: int = 1,
+        drop_rate: int = 0.5,
+        filter_config: List[int] = (64, 128, 256, 512, 512),
+    ) -> None:
         super(SegNet, self).__init__()
 
         self.encoders = nn.ModuleList()
@@ -29,19 +32,29 @@ class SegNet(nn.Module):
 
         for i in range(0, 5):
             # encoder architecture
-            self.encoders.append(_Encoder(encoder_filter_config[i],
-                                          encoder_filter_config[i + 1],
-                                          encoder_n_layers[i], drop_rate))
+            self.encoders.append(
+                _Encoder(
+                    encoder_filter_config[i],
+                    encoder_filter_config[i + 1],
+                    encoder_n_layers[i],
+                    drop_rate,
+                )
+            )
 
             # decoder architecture
-            self.decoders.append(_Decoder(decoder_filter_config[i],
-                                          decoder_filter_config[i + 1],
-                                          decoder_n_layers[i], drop_rate))
+            self.decoders.append(
+                _Decoder(
+                    decoder_filter_config[i],
+                    decoder_filter_config[i + 1],
+                    decoder_n_layers[i],
+                    drop_rate,
+                )
+            )
 
         # final classifier (equivalent to a fully connected layer)
         self.classifier = nn.Conv2d(filter_config[0], num_classes, 3, 1, 1)
 
-    def forward(self, x : torch.Tensor ) -> torch.Tensor :
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         indices = []
         unpool_sizes = []
         feat = x
@@ -60,7 +73,9 @@ class SegNet(nn.Module):
 
 
 class _Encoder(nn.Module):
-    def __init__(self, n_in_feat : int, n_out_feat : int , n_blocks : int =2, drop_rate : int = 0.5) -> None:
+    def __init__(
+        self, n_in_feat: int, n_out_feat: int, n_blocks: int = 2, drop_rate: int = 0.5
+    ) -> None:
         """Encoder layer follows VGG rules + keeps pooling indices
         Args:
             n_in_feat (int): number of input features
@@ -70,20 +85,24 @@ class _Encoder(nn.Module):
         """
         super(_Encoder, self).__init__()
 
-        layers = [nn.Conv2d(n_in_feat, n_out_feat, 3, 1, 1),
-                  nn.BatchNorm2d(n_out_feat),
-                  nn.ReLU(inplace=True)]
+        layers = [
+            nn.Conv2d(n_in_feat, n_out_feat, 3, 1, 1),
+            nn.BatchNorm2d(n_out_feat),
+            nn.ReLU(inplace=True),
+        ]
 
         if n_blocks > 1:
-            layers += [nn.Conv2d(n_out_feat, n_out_feat, 3, 1, 1),
-                       nn.BatchNorm2d(n_out_feat),
-                       nn.ReLU(inplace=True)]
+            layers += [
+                nn.Conv2d(n_out_feat, n_out_feat, 3, 1, 1),
+                nn.BatchNorm2d(n_out_feat),
+                nn.ReLU(inplace=True),
+            ]
             if n_blocks == 3:
                 layers += [nn.Dropout(drop_rate)]
 
         self.features = nn.Sequential(*layers)
 
-    def forward(self, x : torch.Tensor ) -> torch.Tensor :
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         output = self.features(x)
         return F.max_pool2d(output, 2, 2, return_indices=True), output.size()
 
@@ -97,22 +116,29 @@ class _Decoder(nn.Module):
         n_blocks (int): number of conv-batch-relu block inside the decoder
         drop_rate (float): dropout rate to use
     """
-    def __init__(self, n_in_feat : int, n_out_feat : int, n_blocks : int =2, drop_rate : int =0.5) -> None:
+
+    def __init__(
+        self, n_in_feat: int, n_out_feat: int, n_blocks: int = 2, drop_rate: int = 0.5
+    ) -> None:
         super(_Decoder, self).__init__()
 
-        layers = [nn.Conv2d(n_in_feat, n_in_feat, 3, 1, 1),
-                  nn.BatchNorm2d(n_in_feat),
-                  nn.ReLU(inplace=True)]
+        layers = [
+            nn.Conv2d(n_in_feat, n_in_feat, 3, 1, 1),
+            nn.BatchNorm2d(n_in_feat),
+            nn.ReLU(inplace=True),
+        ]
 
         if n_blocks > 1:
-            layers += [nn.Conv2d(n_in_feat, n_out_feat, 3, 1, 1),
-                       nn.BatchNorm2d(n_out_feat),
-                       nn.ReLU(inplace=True)]
+            layers += [
+                nn.Conv2d(n_in_feat, n_out_feat, 3, 1, 1),
+                nn.BatchNorm2d(n_out_feat),
+                nn.ReLU(inplace=True),
+            ]
             if n_blocks == 3:
                 layers += [nn.Dropout(drop_rate)]
 
         self.features = nn.Sequential(*layers)
 
-    def forward(self, x : torch.Tensor , indices : int , size : int) -> torch.Tensor :
+    def forward(self, x: torch.Tensor, indices: int, size: int) -> torch.Tensor:
         unpooled = F.max_unpool2d(x, indices, 2, 2, 0, size)
         return self.features(unpooled)

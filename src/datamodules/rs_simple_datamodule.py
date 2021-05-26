@@ -58,7 +58,9 @@ class RSSimpleDataModule(pl.LightningDataModule):
         )
         if self.google_maps_api != "":
             google_maps_trainset = GoogleMapsDataset(
-                self.data_dir, transforms=self.transforms_train, google_maps_api=self.google_maps_api
+                self.data_dir,
+                transforms=self.transforms_train,
+                google_maps_api=self.google_maps_api,
             )
             self.data_pretrain = google_maps_trainset
 
@@ -66,15 +68,13 @@ class RSSimpleDataModule(pl.LightningDataModule):
             self.data_dir, train=False, transforms=self.transforms_test
         )
 
-        
-
         self.data_train, self.data_val = random_split(
             kaggle_trainset, self.train_val_split
         )
         self.data_test = testset
 
     def train_dataloader(self) -> DataLoader:
-        #Pretrain on google maps dataset and then train on kaggle dataset
+        # Pretrain on google maps dataset and then train on kaggle dataset
         if self.google_maps_api != "":
             if self.trainer.current_epoch <= 60:
                 if self.trainer.current_epoch <= 1:
@@ -96,7 +96,7 @@ class RSSimpleDataModule(pl.LightningDataModule):
                     pin_memory=self.pin_memory,
                     shuffle=True,
                 )
-        #Train only on kaggle dataset if no google maps API key was given
+        # Train only on kaggle dataset if no google maps API key was given
         else:
             return DataLoader(
                 dataset=self.data_train,

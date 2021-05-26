@@ -1,0 +1,4 @@
+_target_: src.models.architectures.efflab.EffLab
+in_channels: 3
+out_channels: 1
+encoder_name: efficientnet-b6

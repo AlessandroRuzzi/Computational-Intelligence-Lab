@@ -1,0 +1,28 @@
+# @package _global_
+
+defaults:
+  - override /model/architecture: unet.yaml
+  - override /model/loss: mixed_loss.yaml 
+  - override /datamodule/transforms_train: transforms_2_416x416.yaml
+  - override /datamodule/transforms_test: transforms_1_608x608.yaml
+  # Color logging 
+  - override /hydra/hydra_logging: colorlog
+  - override /hydra/job_logging: colorlog 
+
+seed: 12345
+test_on_best: True 
+
+trainer: 
+  gpus: 1
+  max_epochs: 500
+
+model:
+  lr: 0.0001
+  architecture:
+    encoder_name: resnext101_32x8d
+  loss: 
+    weights: [0.75, 0.25] 
+
+datamodule:
+  batch_size: 8
+  train_val_split: [80, 20]

@@ -9,7 +9,6 @@ from src.models.metrics.kaggle_accuracy import KaggleAccuracy
 
 # from src.models.metrics.dice_loss import BinaryDiceLoss
 
-
 class RSSimpleModel(pl.LightningModule):
     def __init__(
         self,

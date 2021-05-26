@@ -16,7 +16,11 @@ python-dotenv==0.16.0
 pytorch_lightning==1.2.5
 rich==10.0.1
 scikit_learn==0.23.1
+scikit-image==0.18.1
 timm==0.4.5
 torch==1.8.1
 torchtext== 0.9.1
 torchvision==0.9.1
+notebook==6.4.0
+ipywidgets==7.6.3
+efficientnet-pytorch==0.7.1

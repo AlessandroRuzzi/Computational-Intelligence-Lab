@@ -25,7 +25,7 @@ class EfficientNetEncoder(EfficientNet):
             self._blocks[: self.stage_idxs[0]],
             self._blocks[self.stage_idxs[0] : self.stage_idxs[1]],
             self._blocks[self.stage_idxs[1] : self.stage_idxs[2]],
-            self._blocks[self.stage_idxs[2] :]
+            self._blocks[self.stage_idxs[2] :],
         ]
 
         if pretrained:

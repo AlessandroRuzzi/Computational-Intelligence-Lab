@@ -91,7 +91,7 @@ class ResNetEncoder(ResNetEncoderBase):
                 "block": Bottleneck,
                 "layers": [3, 4, 23, 3],
                 "groups": 32,
-                "width_per_group": 8,
+                "width_per_group": 16,
             },
         },
     }

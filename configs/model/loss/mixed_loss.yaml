@@ -2,5 +2,7 @@ _target_: src.models.metrics.mixed_loss.MixedLoss
 weights: [0.5, 0.5]
 losses: 
   - _target_: torch.nn.BCEWithLogitsLoss
-    weight: [0.3, 0.7]
+    weight: 
+      _target_: torch.tensor
+      data: [0.3, 0.7]
   - _target_: src.models.metrics.dice_loss.BinaryDiceLoss

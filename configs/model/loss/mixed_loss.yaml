@@ -4,5 +4,5 @@ losses:
   - _target_: torch.nn.BCEWithLogitsLoss
     pos_weight: 
       _target_: torch.tensor
-      data: [0.3, 0.7]
+      data: [2.5]
   - _target_: src.models.metrics.dice_loss.BinaryDiceLoss

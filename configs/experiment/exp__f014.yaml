@@ -22,10 +22,14 @@ model:
     backbone_name: resnext101
   loss: 
     weights: [0.75, 0.25] 
+  - _target_: torch.nn.BCEWithLogitsLoss
+    pos_weight: 
+      _target_: torch.cuda.FloatTensor
+      data: [2.5]
 
 datamodule:
   batch_size: 8
-  train_val_split: [100, 0]
+  train_val_split: [80, 20]
 
 callbacks: 
   model_checkpoint:

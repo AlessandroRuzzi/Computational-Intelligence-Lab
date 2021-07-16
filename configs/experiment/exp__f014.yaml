@@ -21,11 +21,13 @@ model:
   architecture:
     backbone_name: resnext101
   loss: 
-    weights: [0.75, 0.25] 
-  - _target_: torch.nn.BCEWithLogitsLoss
-    pos_weight: 
-      _target_: torch.cuda.FloatTensor
-      data: [2.5]
+    weights: [0.75, 0.25]
+    losses: 
+    - _target_: torch.nn.BCEWithLogitsLoss
+      pos_weight: 
+        _target_: torch.cuda.FloatTensor
+        data: [2.5]
+    - _target_: src.models.metrics.dice_loss.BinaryDiceLoss
 
 datamodule:
   batch_size: 8

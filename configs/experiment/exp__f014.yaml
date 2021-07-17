@@ -14,7 +14,7 @@ test_on_best: True
 
 trainer: 
   gpus: 1
-  max_epochs: 250
+  max_epochs: 500
 
 model:
   lr: 0.0001
@@ -30,8 +30,8 @@ model:
     - _target_: src.models.metrics.dice_loss.BinaryDiceLoss
 
 datamodule:
-  batch_size: 8
-  train_val_split: [80, 20]
+  batch_size: 4
+  train_val_split: [100, 0]
 
 callbacks: 
   model_checkpoint:

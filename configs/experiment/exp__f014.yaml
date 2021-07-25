@@ -24,9 +24,6 @@ model:
     weights: [0.75, 0.25]
     losses: 
     - _target_: torch.nn.BCEWithLogitsLoss
-      pos_weight: 
-        _target_: torch.cuda.FloatTensor
-        data: [2.5]
     - _target_: src.models.metrics.dice_loss.BinaryDiceLoss
 
 datamodule:

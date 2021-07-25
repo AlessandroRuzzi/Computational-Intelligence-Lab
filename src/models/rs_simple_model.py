@@ -79,33 +79,37 @@ class RSSimpleModel(pl.LightningModule):
         x, kaggle_ids = batch
 
         batch_size = x.shape[0]
-        splits = 4
 
         dtype = torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTensor
-
+        #print("0: ",x.size())
         kernel_size = 400
         stride = kernel_size//2 
         x_unf = F.unfold(x, kernel_size, stride=stride)
 
-        x_unf = x_unf.permute(0, 2, 1)
-        x_unf = x_unf.view(batch_size * splits, 3, 400, 400)
+        #print("1: ",x_unf.size())
 
-        splits_pred = []
-        for split in (0, splits):
-            pred = torch.sigmoid(self.forward(x_unf[batch_size * split : batch_size * split + batch_size, : , :]))
-            splits_pred.append(pred)
+        splits = x_unf.shape[2]
+
+        x_unf = x_unf.permute(0, 2, 1)
         
-        preds_proba = torch.stack(splits_pred)
-        preds_proba = preds_proba.view(batch_size, 3 * 400 * 400, splits)
+        x_unf = x_unf.reshape(batch_size * splits, 3, 400, 400)
+
+        #print("2: ",x_unf.size())
+        splits_pred = []
+        for split in range(splits):
+            #print("SPLIT: ", split)
+            pred = torch.sigmoid(self.forward(x_unf[batch_size * split : batch_size * split + batch_size, : , : , :]))
+            splits_pred.append(pred)
+            #print(pred.size())
+
+        preds_proba = torch.cat(splits_pred, 0)
+        #print("P_PROBA: ", preds_proba.size())
+        preds_proba = preds_proba.view(batch_size, 1 * 400 * 400, splits)
 
         pred_f = F.fold(preds_proba,x.shape[-2:],kernel_size,stride=stride)
-        norm_map = F.fold(F.unfold(torch.ones(x.shape).type(dtype),kernel_size,stride=stride),x.shape[-2:],kernel_size,stride=stride)
+        #print("PRED_f:", pred_f.size())
+        norm_map = F.fold(F.unfold(torch.ones(pred_f.size()).type(dtype),kernel_size,stride=stride),x.shape[-2:],kernel_size,stride=stride)
         pred_f /= norm_map
-
-        temp = F.fold(torch.ones(batch_size * splits, 3, 400, 400),x.shape[-2:],kernel_size,stride=stride)
-        temp /= norm_map
-
-        pred_f /= temp
         preds_discr = (pred_f > 0.5).float()
         
         # Log prediction images

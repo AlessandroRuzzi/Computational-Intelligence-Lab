@@ -27,7 +27,7 @@ model:
     - _target_: src.models.metrics.dice_loss.BinaryDiceLoss
 
 datamodule:
-  batch_size: 4
+  batch_size: 1
   train_val_split: [100, 0]
 
 callbacks: 

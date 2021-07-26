@@ -9,7 +9,28 @@ import torch.nn.functional as F
 import src.utils.model_utils as utils
 from src.models.metrics.kaggle_accuracy import KaggleAccuracy
 
+import matplotlib.pyplot as plt
+
 # from src.models.metrics.dice_loss import BinaryDiceLoss
+
+def imshow(
+    image: Any,
+    normalize: bool = False,
+) -> None:
+    """Imshow for Tensor."""
+    fig, ax = plt.subplots()
+    image = image.numpy().transpose((1, 2, 0))
+
+    if normalize:
+        mean = np.array([0.485, 0.456, 0.406])
+        std = np.array([0.229, 0.224, 0.225])
+        image = std * image + mean
+        image = np.clip(image, 0, 1)
+
+    ax.imshow(image, cmap="gray")
+    ax.set_xticklabels(list(""))
+    ax.set_yticklabels(list(""))
+    plt.show()
 
 class RSSimpleModel(pl.LightningModule):
     def __init__(
@@ -80,6 +101,8 @@ class RSSimpleModel(pl.LightningModule):
 
         batch_size = x.shape[0]
 
+        #imshow(x[0, :, : , :])
+
         dtype = torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTensor
         #print("0: ",x.size())
         kernel_size = 400
@@ -98,17 +121,20 @@ class RSSimpleModel(pl.LightningModule):
         splits_pred = []
         for split in range(splits):
             #print("SPLIT: ", split)
-            pred = torch.sigmoid(self.forward(x_unf[batch_size * split : batch_size * split + batch_size, : , : , :]))
+            #imshow(x_unf[batch_size * split : batch_size * split + batch_size, : , : , :][1, : , : , :])
+            pred = torch.sigmoid(self.forward(x_unf[batch_size * split : batch_size * (split + 1), : , : , :]))
             splits_pred.append(pred)
             #print(pred.size())
-
         preds_proba = torch.cat(splits_pred, 0)
-        #print("P_PROBA: ", preds_proba.size())
-        preds_proba = preds_proba.view(batch_size, 1 * 400 * 400, splits)
-
+        #print("P_PROBA 0: ", preds_proba.size())
+        preds_proba = preds_proba.reshape(batch_size, splits, 3 * 400 * 400)
+        preds_proba = preds_proba.permute(0, 2, 1)
+        #print("P_PROBA 1: ", preds_proba.size())        
         pred_f = F.fold(preds_proba,x.shape[-2:],kernel_size,stride=stride)
         #print("PRED_f:", pred_f.size())
+        #print("SHAPE: ", x.shape[-2:])
         norm_map = F.fold(F.unfold(torch.ones(pred_f.size()).type(dtype),kernel_size,stride=stride),x.shape[-2:],kernel_size,stride=stride)
+        #print("MAP: ", norm_map.shape)
         pred_f /= norm_map
         preds_discr = (pred_f > 0.5).float()
         

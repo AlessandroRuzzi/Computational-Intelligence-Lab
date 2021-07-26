@@ -8,7 +8,7 @@ pin_memory: False
 
 defaults:
   - transforms_train: transforms_0_418x418.yaml
-  - transforms_test: transforms_0_418x418.yaml
+  - transforms_test: transforms_1_608x608.yaml
 
 
 

@@ -10,8 +10,8 @@ defaults:
 work_dir: ${hydra:runtime.cwd}
 data_dir: ${work_dir}/data 
 logs_dir: ${work_dir}/logs
-ckpts_dir: /cluster/home/aruzzi/logs/ckpts
-preds_dir: /cluster/home/aruzzi/logs/preds
+ckpts_dir: /cluster/home/${ETH_USERNAME}/logs/ckpts
+preds_dir: /cluster/home/${ETH_USERNAME}/logs/preds
 
 debug: False # This uses pytorch-lighning fast_dev_run
 print_config: True # Pretty prints configs at the start of run 

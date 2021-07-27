@@ -1,53 +1,40 @@
-from os import X_OK
 from typing import Any, Dict, List, Sequence, Tuple, Union
-import numpy as np
+
 import pytorch_lightning as pl
 import torch
-from torch.optim import Optimizer
 import torch.nn.functional as F
+from torch.optim import Optimizer
 
 import src.utils.model_utils as utils
 from src.models.metrics.kaggle_accuracy import KaggleAccuracy
+from src.models.rs_simple_model import RSSimpleModel
 
-import matplotlib.pyplot as plt
+# flake8: noqa
+# mypy: ignore-errors
 
-# from src.models.metrics.dice_loss import BinaryDiceLoss
 
-def imshow(
-    image: Any,
-    normalize: bool = False,
-) -> None:
-    """Imshow for Tensor."""
-    fig, ax = plt.subplots()
-    image = image.numpy().transpose((1, 2, 0))
-
-    if normalize:
-        mean = np.array([0.485, 0.456, 0.406])
-        std = np.array([0.229, 0.224, 0.225])
-        image = std * image + mean
-        image = np.clip(image, 0, 1)
-
-    ax.imshow(image, cmap="gray")
-    ax.set_xticklabels(list(""))
-    ax.set_yticklabels(list(""))
-    plt.show()
-
-class RSSimpleModel(pl.LightningModule):
+class RSSensembleModel(pl.LightningModule):
     def __init__(
         self,
         loss: torch.nn.Module,
-        architecture: torch.nn.Module,
+        architectures: str,
         lr: float = 0.001,
-        stride_factor : int = 2,
         dir_preds_test: str = "path",
         use_scheduler: bool = False,
     ) -> None:
         super().__init__()
 
-        self.model = architecture
+        self.models = []
+        for arc in architectures:
+            model = RSSimpleModel()
+            state_dict = torch.load(
+                arc,
+                map_location="cuda",
+            )
+            print(model.load_state_dict(state_dict))
+            self.models.append(model)
         self.loss = loss
         self.lr = lr
-        self.stride_factor = stride_factor
         self.use_scheduler = use_scheduler
         self.save_hyperparameters()
         self.metrics = [("kaggle", KaggleAccuracy())]
@@ -98,50 +85,73 @@ class RSSimpleModel(pl.LightningModule):
 
         return {"loss": loss}
 
-    def test_step(self, batch: torch.Tensor, batch_id : int) -> Dict[str, torch.Tensor]:
+    def test_step(self, batch: torch.Tensor, batch_id: int) -> Dict[str, torch.Tensor]:
         x, kaggle_ids = batch
-
+        probs = []
         batch_size = x.shape[0]
 
-        #imshow(x[0, :, : , :])
+        for index, model in enumerate(self.models):
 
-        dtype = torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTensor
-        #print("0: ",x.size())
-        kernel_size = 400
-        stride = kernel_size//self.stride_factor
-        x_unf = F.unfold(x, kernel_size, stride=stride)
+            dtype = (
+                torch.cuda.FloatTensor
+                if torch.cuda.is_available()
+                else torch.FloatTensor
+            )
+            # print("0: ",x.size())
+            kernel_size = 400
+            stride = kernel_size // 2
+            x_unf = F.unfold(x, kernel_size, stride=stride)
 
-        #print("1: ",x_unf.size())
+            # print("1: ",x_unf.size())
 
-        splits = x_unf.shape[2]
+            splits = x_unf.shape[2]
 
-        x_unf = x_unf.permute(0, 2, 1)
-        
-        x_unf = x_unf.reshape(batch_size * splits, 3, 400, 400)
+            x_unf = x_unf.permute(0, 2, 1)
 
-        #print("2: ",x_unf.size())
-        splits_pred = []
-        for split in range(splits):
-            #print("SPLIT: ", split)
-            #imshow(x_unf[batch_size * split : batch_size * split + batch_size, : , : , :][1, : , : , :])
-            pred = torch.sigmoid(self.forward(x_unf[batch_size * split : batch_size * (split + 1), : , : , :]))
-            splits_pred.append(pred)
-            #print(pred.size())
-        preds_proba = torch.cat(splits_pred, 0)
-        #print("P_PROBA 0: ", preds_proba.size())
-        preds_proba = preds_proba.reshape(batch_size, splits, 1 * 400 * 400)
-        preds_proba = preds_proba.permute(0, 2, 1)
-        #print("P_PROBA 1: ", preds_proba.size())        
-        pred_f = F.fold(preds_proba,x.shape[-2:],kernel_size,stride=stride)
-        #print("PRED_f:", pred_f.size())
-        #print("SHAPE: ", x.shape[-2:])
-        norm_map = F.fold(F.unfold(torch.ones(pred_f.size()).type(dtype),kernel_size,stride=stride),x.shape[-2:],kernel_size,stride=stride)
-        #print("MAP: ", norm_map.shape)
-        pred_f /= norm_map
-        preds_discr = (pred_f > 0.5).float()
-        
+            x_unf = x_unf.reshape(batch_size * splits, 3, 400, 400)
+
+            # print("2: ",x_unf.size())
+            splits_pred = []
+            for split in range(splits):
+                # print("SPLIT: ", split)
+                # imshow(x_unf[batch_size * split : batch_size * split + batch_size, : , : , :][1, : , : , :])
+                pred = torch.sigmoid(
+                    model.forward(
+                        x_unf[batch_size * split : batch_size * (split + 1), :, :, :]
+                    )
+                )
+                splits_pred.append(pred)
+                # print(pred.size())
+            preds_proba = torch.cat(splits_pred, 0)
+            # print("P_PROBA 0: ", preds_proba.size())
+            preds_proba = preds_proba.reshape(batch_size, splits, 1 * 400 * 400)
+            preds_proba = preds_proba.permute(0, 2, 1)
+            # print("P_PROBA 1: ", preds_proba.size())
+            pred_f = F.fold(preds_proba, x.shape[-2:], kernel_size, stride=stride)
+            # print("PRED_f:", pred_f.size())
+            # print("SHAPE: ", x.shape[-2:])
+            norm_map = F.fold(
+                F.unfold(
+                    torch.ones(pred_f.size()).type(dtype), kernel_size, stride=stride
+                ),
+                x.shape[-2:],
+                kernel_size,
+                stride=stride,
+            )
+            # print("MAP: ", norm_map.shape)
+            pred_f /= norm_map
+            pred_f = torch.reshape(pred_f, (x.shape[0], 1, 608, 608))
+            if index == 0:
+                probs = pred_f
+            else:
+                probs = torch.cat((probs, pred_f), dim=1)
+
+        preds_proba = torch.reshape(probs, (x.shape[0], len(self.models), 608, 608))
+        preds_proba = torch.mean(preds_proba, dim=1)
+        preds_discr = (preds_proba > 0.5).float()
+
         # Log prediction images
-        image_grid = utils.build_image_grid_test(x, pred_f).cpu()
+        image_grid = utils.build_image_grid_test(x, preds_proba).cpu()
         self.logger[0].experiment.log_image(image_grid, "Test Batch")
 
         # Save predictions images to folder

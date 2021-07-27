@@ -1,10 +1,9 @@
 
 defaults:
   - loss: dice_loss.yaml
-  - architecture: conv_layer.yaml
+  - architectures: ['','','','']
 
-_target_: src.models.rs_simple_model.RSSimpleModel
+_target_: src.models.rs_simple_model.RSSensembleModel
 dir_preds_test: ${preds_dir}/${now:%Y-%m-%d}/${now:%H-%M-%S}
 lr: 0.001
-stride_factor : 4
 use_scheduler: False

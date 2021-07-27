@@ -1,39 +1,32 @@
 # @package _global_
 
 defaults:
-  - override /model/architecture: unet_backboned.yaml
-  - override /model/loss: mixed_loss.yaml 
+  - override /model: rs_ensemble_model.yaml
+  - override /model/loss: mixed_loss.yaml
   - override /datamodule/transforms_train: transforms_1_400x400.yaml
   - override /datamodule/transforms_test: transforms_1_608x608.yaml
-  # Color logging 
+  # Color logging
   - override /hydra/hydra_logging: colorlog
-  - override /hydra/job_logging: colorlog 
+  - override /hydra/job_logging: colorlog
 
 seed: 12345
-test_on_best: True 
+test_on_best: True
 
-trainer: 
+trainer:
   gpus: 1
   max_epochs: 500
 
 model:
-  lr: 0.0001
-  architecture:
-    backbone_name: resnext101
-  loss: 
-    weights: [0.75, 0.25]
-    losses: 
-    - _target_: torch.nn.BCEWithLogitsLoss
-    - _target_: src.models.metrics.dice_loss.BinaryDiceLoss
+  architecture: ['','','','']
 
 datamodule:
   batch_size: 8
   train_val_split: [80, 20]
 
-callbacks: 
+callbacks:
   model_checkpoint:
     _target_: pytorch_lightning.callbacks.ModelCheckpoint
-    monitor: "val_kaggle"   # name of the logged metric which determines when model is improving
+    monitor: "train_kaggle"   # name of the logged metric which determines when model is improving
     save_top_k: 1           # save k best models (determined by above metric)
     save_last: True         # additionaly always save model from last epoch
     mode: "max"             # can be "max" or "min"
@@ -43,12 +36,12 @@ callbacks:
 
   early_stopping:
     _target_: pytorch_lightning.callbacks.EarlyStopping
-    monitor: "val_kaggle"   # name of the logged metric which determines when model is improving
+    monitor: "train_kaggle"   # name of the logged metric which determines when model is improving
     patience: 150           # how many epochs of not improving until training stops
     mode: "max"             # can be "max" or "min"
-    min_delta: 0            # minimum change in the monitored metric needed to qualify as an improvement 
+    min_delta: 0            # minimum change in the monitored metric needed to qualify as an improvement
 
   lr_monitor:
     _target_: pytorch_lightning.callbacks.lr_monitor.LearningRateMonitor
     logging_interval: 'epoch'
- 
+

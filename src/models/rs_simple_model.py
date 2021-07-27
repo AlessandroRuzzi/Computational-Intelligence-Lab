@@ -38,6 +38,7 @@ class RSSimpleModel(pl.LightningModule):
         loss: torch.nn.Module,
         architecture: torch.nn.Module,
         lr: float = 0.001,
+        stride_factor : int = 2,
         dir_preds_test: str = "path",
         use_scheduler: bool = False,
     ) -> None:
@@ -46,6 +47,7 @@ class RSSimpleModel(pl.LightningModule):
         self.model = architecture
         self.loss = loss
         self.lr = lr
+        self.stride_factor = stride_factor
         self.use_scheduler = use_scheduler
         self.save_hyperparameters()
         self.metrics = [("kaggle", KaggleAccuracy())]
@@ -96,7 +98,7 @@ class RSSimpleModel(pl.LightningModule):
 
         return {"loss": loss}
 
-    def test_step(self, batch: torch.Tensor, batch_id: int) -> Dict[str, torch.Tensor]:
+    def test_step(self, batch: torch.Tensor, batch_id : int) -> Dict[str, torch.Tensor]:
         x, kaggle_ids = batch
 
         batch_size = x.shape[0]
@@ -106,7 +108,7 @@ class RSSimpleModel(pl.LightningModule):
         dtype = torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTensor
         #print("0: ",x.size())
         kernel_size = 400
-        stride = kernel_size//2 
+        stride = kernel_size//self.stride_factor
         x_unf = F.unfold(x, kernel_size, stride=stride)
 
         #print("1: ",x_unf.size())

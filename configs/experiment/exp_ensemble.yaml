@@ -10,6 +10,7 @@ defaults:
   - override /hydra/job_logging: colorlog
 
 seed: 12345
+test: True
 test_on_best: True
 
 trainer:

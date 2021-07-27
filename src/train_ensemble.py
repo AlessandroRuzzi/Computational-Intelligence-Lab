@@ -82,4 +82,4 @@ def train(config: DictConfig) -> None:
         log.info(
             f"Starting test set evaluation on checkpoint {config.model.checkpoint_path}"
         )
-        trainer.test(model=model, datamodule=datamodule)
+        trainer.test(ckpt_path=None, model=model, datamodule=datamodule)

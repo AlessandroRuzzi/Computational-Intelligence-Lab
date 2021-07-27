@@ -104,12 +104,12 @@ class RSSimpleModel(pl.LightningModule):
         #imshow(x[0, :, : , :])
 
         dtype = torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTensor
-        print("0: ",x.size())
+        #print("0: ",x.size())
         kernel_size = 400
         stride = kernel_size//2 
         x_unf = F.unfold(x, kernel_size, stride=stride)
 
-        print("1: ",x_unf.size())
+        #print("1: ",x_unf.size())
 
         splits = x_unf.shape[2]
 
@@ -117,24 +117,24 @@ class RSSimpleModel(pl.LightningModule):
         
         x_unf = x_unf.reshape(batch_size * splits, 3, 400, 400)
 
-        print("2: ",x_unf.size())
+        #print("2: ",x_unf.size())
         splits_pred = []
         for split in range(splits):
-            print("SPLIT: ", split)
+            #print("SPLIT: ", split)
             #imshow(x_unf[batch_size * split : batch_size * split + batch_size, : , : , :][1, : , : , :])
             pred = torch.sigmoid(self.forward(x_unf[batch_size * split : batch_size * (split + 1), : , : , :]))
             splits_pred.append(pred)
-            print(pred.size())
+            #print(pred.size())
         preds_proba = torch.cat(splits_pred, 0)
-        print("P_PROBA 0: ", preds_proba.size())
+        #print("P_PROBA 0: ", preds_proba.size())
         preds_proba = preds_proba.reshape(batch_size, splits, 1 * 400 * 400)
         preds_proba = preds_proba.permute(0, 2, 1)
-        print("P_PROBA 1: ", preds_proba.size())        
+        #print("P_PROBA 1: ", preds_proba.size())        
         pred_f = F.fold(preds_proba,x.shape[-2:],kernel_size,stride=stride)
-        print("PRED_f:", pred_f.size())
-        print("SHAPE: ", x.shape[-2:])
+        #print("PRED_f:", pred_f.size())
+        #print("SHAPE: ", x.shape[-2:])
         norm_map = F.fold(F.unfold(torch.ones(pred_f.size()).type(dtype),kernel_size,stride=stride),x.shape[-2:],kernel_size,stride=stride)
-        print("MAP: ", norm_map.shape)
+        #print("MAP: ", norm_map.shape)
         pred_f /= norm_map
         preds_discr = (pred_f > 0.5).float()
         

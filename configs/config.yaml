@@ -7,7 +7,7 @@ defaults:
   - callbacks: default_callbacks.yaml
   - logger: comet.yaml 
 
-work_dir: ${hydra:runtime.cwd}
+work_dir: /cluster/scratch/aruzzi
 data_dir: ${work_dir}/data 
 logs_dir: ${work_dir}/logs
 ckpts_dir: ${logs_dir}/ckpts

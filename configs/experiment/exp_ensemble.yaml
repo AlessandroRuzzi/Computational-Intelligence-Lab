@@ -18,7 +18,7 @@ trainer:
   max_epochs: 500
 
 model:
-  architecture: ['','','','']
+  architecture: ['/cluster/home/mdevita/Computational-Intelligence-Lab-2021/logs/ckpts/2021-07-27/10-02-51/epoch=356-val_kaggle=0.959.ckpt','/cluster/home/mdevita/Computational-Intelligence-Lab-2021/logs/ckpts/2021-07-27/10-52-20/epoch=261-val_kaggle=0.951.ckpt']
 
 datamodule:
   batch_size: 8

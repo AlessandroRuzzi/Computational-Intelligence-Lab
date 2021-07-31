@@ -41,7 +41,7 @@ source ./leonhard_init.sh
  bsub -W 24:00 -R "rusage[mem=64000, ngpus_excl_p=1]" -R "select[gpu_mtotal0>=10240]" python3 ./run.py +experiment=exp__f014
 ```
 
-**Step 7:** Download the predictions from comet, you will find a file called submission.csv in the comet section called ``Assets & Artifacts``, inside the folder ``others``.
+**Step 7:** Download the predictions from comet, you will find a file called ``submission.csv`` in the comet section called ``Assets & Artifacts``, inside the folder ``others``.
 
 
 ## How to run on Leonhard Cluster 

@@ -36,12 +36,36 @@ source ./leonhard_init.sh
 
 **Step 5:** Open the file configs/config.yaml and insert your eth username at line 10.
 
-**Step 6:** Train the model and produce predictions:
+**Step 6:** Train the model on experiment 14 without Google API:
+```console
+ bsub -W 24:00 -R "rusage[mem=64000, ngpus_excl_p=1]" -R "select[gpu_mtotal0>=10240]" python3 ./run.py +experiment=exp__f014
+```
+**Step 7:** Train the model on experiment 15 without Google API:
+```console
+ bsub -W 24:00 -R "rusage[mem=64000, ngpus_excl_p=1]" -R "select[gpu_mtotal0>=10240]" python3 ./run.py +experiment=exp__f015
+```
+**Step 8:** Add the Google API key in the .env file (you can find it in the CMT3 submission's comment)
+
+```console
+COMET_API_KEY=Your Key
+COMET_WORKSPACE=alessandroruzzi
+KAGGLE_USERNAME=alessandroruzzi
+KAGGLE_KEY=Your kaggle Key
+GOOGLE_MAPS_API_KEY= PUT THE API KEY HERE
+```
+
+**Step 9:** Train the model on experiment 14:
 ```console
  bsub -W 24:00 -R "rusage[mem=64000, ngpus_excl_p=1]" -R "select[gpu_mtotal0>=10240]" python3 ./run.py +experiment=exp__f014
 ```
 
-**Step 7:** Download the predictions from comet, you will find a file called ``submission.csv`` in the comet section called ``Assets & Artifacts``, inside the folder ``others``.
+**Step 10:** Download the predictions from comet, you will find a file called ``submission.csv`` in the comet section called ``Assets & Artifacts``, inside the folder ``others``.
+
+**Step 11:** Combine the predictions with the run_ensemble.py script (replace file1, file2 and file3 with the actual CSV files' paths):
+```console
+ python3 ./run_ensemble.py file1,file2,file3 
+```
+
 
 
 ## How to run on Leonhard Cluster 

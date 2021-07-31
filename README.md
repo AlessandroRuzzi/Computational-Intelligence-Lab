@@ -8,7 +8,7 @@ Repository for the Computational Intelligence Lab course project at ETH Zurich
 git clone https://github.com/AlessandroRuzzi/Computational-Intelligence-Lab-2021
 ```
 
-**Step 2:** Copy new .env file and modify it by adding your environment variables,:
+**Step 2:** Copy new .env file and modify it by adding your environment variables:
 ```console
 cp .env.tmp .env 
 vim .env 
